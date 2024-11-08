@@ -1,4 +1,3 @@
-// Vložení hlavního hlavičkového souboru SDL
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
@@ -6,6 +5,7 @@
 
 #include "lib/game/effects/effects.c"
 #include "lib/game/enemy/enemy.c"
+#include "lib/game/platforms/platforms.c"
 #include "lib/game/player/player.c"
 #include "lib/game/projectile/projectile.h"
 #include "lib/menu/button.c"
@@ -18,6 +18,8 @@
 // Game
 #define ENEMY_BULLET_ALLOC_COUNT 10
 #define SPREAD_EFFECTS_ALLOC_COUNT 5
+
+#define PLATFORMS_COUNT 3
 
 int main(int argc, char* argv[]) {
     // SDL init
@@ -69,6 +71,10 @@ int main(int argc, char* argv[]) {
     int spread_effects_max = SPREAD_EFFECTS_ALLOC_COUNT;
     SpreadEffect* spread_effects = (SpreadEffect*)malloc(
         sizeof(SpreadEffect) * SPREAD_EFFECTS_ALLOC_COUNT);
+
+    Platform platforms[PLATFORMS_COUNT] = {create_new_platform(100, 500),
+                                           create_new_platform(300, 500),
+                                           create_new_platform(500, 500)};
 
     SDL_Event event;
     bool running = true;
@@ -236,6 +242,10 @@ int main(int argc, char* argv[]) {
             render_bullet(&enemy_bullets[i], renderer);
         }
 
+        for (int i = 0; i < PLATFORMS_COUNT; i++) {
+            render_platform(&platforms[i], renderer);
+        }
+
         render_player(&player, renderer);
 
         // Render projectiles
@@ -256,6 +266,9 @@ int main(int argc, char* argv[]) {
     }
 
     // Uvolnění prostředků
+    for (int i = 0; i < PLATFORMS_COUNT; i++) {
+        free(platforms[i].parts);
+    }
     free(enemy_bullets);
     for (int i = 0; i < spread_effects_length; i++) {
         free(spread_effects[i].particles);
