@@ -1,0 +1,3 @@
+/home/zikado/projects/c/homeworks/space-invaders/build/CMakeFiles/space_invaders.dir
+/home/zikado/projects/c/homeworks/space-invaders/build/CMakeFiles/edit_cache.dir
+/home/zikado/projects/c/homeworks/space-invaders/build/CMakeFiles/rebuild_cache.dir
