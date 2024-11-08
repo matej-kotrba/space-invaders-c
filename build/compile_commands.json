@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/zikado/projects/c/homeworks/space-invaders/build",
-  "command": "/usr/bin/gcc -I/usr/include/SDL2 -g -std=gnu11 -fsanitize=address -o CMakeFiles/space_invaders.dir/main.c.o -c /home/zikado/projects/c/homeworks/space-invaders/main.c",
-  "file": "/home/zikado/projects/c/homeworks/space-invaders/main.c",
-  "output": "CMakeFiles/space_invaders.dir/main.c.o"
-}
-]

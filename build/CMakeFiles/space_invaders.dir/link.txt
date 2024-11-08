@@ -1,1 +1,0 @@
-/usr/bin/cc -fsanitize=address CMakeFiles/space_invaders.dir/main.c.o -o space_invaders  -lSDL2 -lSDL2_image -lSDL2_ttf -lm
