@@ -170,6 +170,12 @@ int main(int argc, char* argv[]) {
                 continue;
             }
 
+            for (int j = 0; j < PLATFORMS_COUNT; j++) {
+                if (is_bullet_on_platform(&platforms[j], &enemy_bullets[i])) {
+                    platform_hit(&platforms[j], &enemy_bullets[i]);
+                }
+            }
+
             if (should_remove_bullet(&enemy_bullets[i], WINDOW_WIDTH,
                                      WINDOW_HEIGHT)) {
                 remove_element(enemy_bullets, sizeof(Bullet),

@@ -1,29 +1,40 @@
 #include "platforms.h"
 
 #include <SDL2/SDL.h>
+#include <math.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
-#define PLATFORM_TEMPLATE_ROWS 10
-#define PLATFORM_TEMPLATE_COLUMN 20
-#define PLATFORM_PART_SIZE 4
+#include "../../hitboxes.h"
+#include "../../utils.h"
+#include "../projectile/projectile.h"
 
-static int
-    platform_template[PLATFORM_TEMPLATE_ROWS * PLATFORM_TEMPLATE_COLUMN] = {
-        0, 0, 0, 1, 1, 1, 1, 1, 1, 1,  //
-        0, 0, 1, 1, 1, 1, 1, 1, 1, 1,  //
-        0, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
-        1, 1, 1, 1, 1, 1, 1, 1, 0, 0,  //
-        1, 1, 1, 1, 1, 1, 1, 0, 0, 0,  //
-        1, 1, 1, 1, 1, 1, 0, 0, 0, 0,  //
-        1, 1, 1, 1, 1, 0, 0, 0, 0, 0,  //
-        1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
-        1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
-        1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
-        1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
-        1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
+#define PLATFORM_TEMPLATE_ROWS 18
+#define PLATFORM_TEMPLATE_COLUMNS 20
+#define PLATFORM_PART_SIZE 4
+#define PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD 2
+#define PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD 6
+
+static int platform_template[PLATFORM_TEMPLATE_ROWS *
+                             (PLATFORM_TEMPLATE_COLUMNS / 2)] = {
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1,  //
+    0, 0, 0, 0, 1, 1, 1, 1, 1, 1,  //
+    0, 0, 0, 1, 1, 1, 1, 1, 1, 1,  //
+    0, 0, 1, 1, 1, 1, 1, 1, 1, 1,  //
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  //
+    1, 1, 1, 1, 1, 1, 1, 1, 0, 0,  //
+    1, 1, 1, 1, 1, 1, 1, 0, 0, 0,  //
+    1, 1, 1, 1, 1, 1, 0, 0, 0, 0,  //
+    1, 1, 1, 1, 1, 0, 0, 0, 0, 0,  //
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  //
 };
 
 Platform create_new_platform(int x, int y) {
@@ -31,7 +42,17 @@ Platform create_new_platform(int x, int y) {
         .x = x,
         .y = y,
         .parts = (int*)malloc(PLATFORM_TEMPLATE_ROWS *
-                              PLATFORM_TEMPLATE_COLUMN * sizeof(int))};
+                              PLATFORM_TEMPLATE_COLUMNS * sizeof(int))};
+
+    for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
+        for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
+            int index = j < PLATFORM_TEMPLATE_COLUMNS / 2
+                            ? j
+                            : PLATFORM_TEMPLATE_COLUMNS - 1 - j;
+            p.parts[i * PLATFORM_TEMPLATE_COLUMNS + j] =
+                platform_template[i * (PLATFORM_TEMPLATE_COLUMNS / 2) + index];
+        }
+    }
 
     return p;
 }
@@ -45,14 +66,53 @@ void render_platform(Platform* platform, SDL_Renderer* renderer) {
 
     for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
         rect.y = platform->y + i * PLATFORM_PART_SIZE;
-        for (int j = 0; j < PLATFORM_TEMPLATE_COLUMN * 2; j++) {
-            int index = j < PLATFORM_TEMPLATE_COLUMN
-                            ? j
-                            : 2 * PLATFORM_TEMPLATE_COLUMN - 1 - j;
-            if (platform_template[i * PLATFORM_TEMPLATE_COLUMN + index]) {
+        for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
+            if (platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j]) {
                 rect.x = platform->x + j * PLATFORM_PART_SIZE;
                 SDL_RenderFillRect(renderer, &rect);
             }
         }
     }
+}
+
+void platform_hit(Platform* platform, Bullet* bullet) {
+    int bullet_xm = bullet->x + bullet->w / 2;
+    int bullet_y2 = bullet->y + bullet->h;
+
+    for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
+        for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
+            if (platform->parts[i] == 0) continue;
+
+            int x = abs(bullet_xm - platform->x + j * PLATFORM_PART_SIZE);
+            int y = abs(bullet_y2 - platform->y + i * PLATFORM_PART_SIZE);
+            float c = sqrt(pow((float)x, 2) + pow((float)y, 2));
+
+            if (c <= PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD ||
+                (c <= PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD &&
+                 round(get_random_float(0, 1)))) {
+                platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] = 0;
+            }
+        }
+    }
+}
+
+bool is_bullet_on_platform(Platform* platform, Bullet* bullet) {
+    if (!is_rect_on_rect(platform->x, platform->y,
+                         PLATFORM_TEMPLATE_COLUMNS * PLATFORM_PART_SIZE,
+                         PLATFORM_TEMPLATE_ROWS * PLATFORM_PART_SIZE, bullet->x,
+                         bullet->y, bullet->w, bullet->h))
+        return false;
+
+    for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
+        for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
+            if (is_rect_on_rect(platform->x + j * PLATFORM_PART_SIZE,
+                                platform->y + i * PLATFORM_PART_SIZE,
+                                PLATFORM_PART_SIZE, PLATFORM_PART_SIZE,
+                                bullet->x, bullet->y, bullet->w, bullet->h)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
