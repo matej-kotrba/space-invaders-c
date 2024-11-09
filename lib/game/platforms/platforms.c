@@ -12,7 +12,7 @@
 #define PLATFORM_TEMPLATE_ROWS 18
 #define PLATFORM_TEMPLATE_COLUMNS 20
 #define PLATFORM_PART_SIZE 4
-#define PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD 2
+#define PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD 3
 #define PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD 6
 
 static int platform_template[PLATFORM_TEMPLATE_ROWS *
@@ -83,12 +83,19 @@ void platform_hit(Platform* platform, Bullet* bullet) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
             if (platform->parts[i] == 0) continue;
 
-            int x = abs(bullet_xm - platform->x + j * PLATFORM_PART_SIZE);
-            int y = abs(bullet_y2 - platform->y + i * PLATFORM_PART_SIZE);
-            float c = sqrt(pow((float)x, 2) + pow((float)y, 2));
+            float x = abs(bullet_xm - (platform->x + j * PLATFORM_PART_SIZE));
+            float y = abs(bullet_y2 - (platform->y + i * PLATFORM_PART_SIZE));
+            x = x == 0 ? 0 : pow(x, 2);
+            y = y == 0 ? 0 : pow(y, 2);
 
-            if (c <= PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD ||
-                (c <= PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD &&
+            float c = sqrt(x + y);
+
+            printf("%f\n", c / PLATFORM_PART_SIZE);
+
+            if (c <= PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD *
+                         PLATFORM_PART_SIZE ||
+                (c <= PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD *
+                          PLATFORM_PART_SIZE &&
                  round(get_random_float(0, 1)))) {
                 platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] = 0;
             }
@@ -102,7 +109,6 @@ bool is_bullet_on_platform(Platform* platform, Bullet* bullet) {
                          PLATFORM_TEMPLATE_ROWS * PLATFORM_PART_SIZE, bullet->x,
                          bullet->y, bullet->w, bullet->h))
         return false;
-
     for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
             if (is_rect_on_rect(platform->x + j * PLATFORM_PART_SIZE,
