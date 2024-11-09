@@ -90,7 +90,7 @@ void platform_hit(Platform* platform, Bullet* bullet) {
 
             float c = sqrt(x + y);
 
-            printf("%f\n", c / PLATFORM_PART_SIZE);
+            // printf("%f\n", c / PLATFORM_PART_SIZE);
 
             if (c <= PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD *
                          PLATFORM_PART_SIZE ||

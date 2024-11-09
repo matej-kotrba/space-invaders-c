@@ -5,8 +5,8 @@
 #include "../../hitboxes.h"
 #include "../projectile/projectile.h"
 
-#define ENEMY_WIDTH 60
-#define ENEMY_HEIGHT 60
+#define ENEMY_WIDTH 50
+#define ENEMY_HEIGHT 40
 
 #define ENEMY_GRID_ROW_LENGTH 10
 #define ENEMY_GRID_COLUMN_LENGTH 5

@@ -4,6 +4,7 @@
 
 typedef struct {
     TTF_Font* pixeled;
+    TTF_Font* pixeled_small;
 } Fonts;
 
 Fonts get_fonts();

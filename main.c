@@ -49,6 +49,8 @@ int main(int argc, char* argv[]) {
     Fonts fonts = get_fonts();
 
     // Game objects
+    int score = 0;
+
     Player player =
         create_new_player(WINDOW_WIDTH / 2 - 25, WINDOW_HEIGHT - 100, 50, 50);
 
@@ -261,7 +263,13 @@ int main(int argc, char* argv[]) {
             render_bullet(&player.projectile, renderer);
         }
 
-        player_display_hp(&player, renderer, 20, 10, WINDOW_WIDTH - 40);
+        player_display_hp(&player, renderer, WINDOW_WIDTH / 2 + 20, 10,
+                          WINDOW_WIDTH / 2 - 40);
+
+        SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+        char score_text[20];
+        sprintf(score_text, "Score: %d", score);
+        render_text(renderer, fonts.pixeled_small, 10, 0, c, score_text);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         // draw_circle(renderer, 300, 500, 10);

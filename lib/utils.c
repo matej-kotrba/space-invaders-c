@@ -65,6 +65,21 @@ void draw_circle(SDL_Renderer* renderer, int center_x, int center_y,
                        center_x + radius, center_y);
 }
 
+void render_text(SDL_Renderer* renderer, TTF_Font* font, int x, int y,
+                 SDL_Color c, const char* text) {
+    int text_w, text_h;
+
+    TTF_SizeText(font, text, &text_w, &text_h);
+
+    SDL_Rect border_rect = {.x = x, .y = y, .w = text_w, .h = text_h};
+
+    SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+
+    SDL_Rect text_rect = {.x = x, .y = y, .w = text_w, .h = text_h};
+
+    sdl_draw_text(renderer, font, c, text_rect, text);
+}
+
 Vector2 new_vec2(int x, int y) {
     Vector2 vec = {.x = x, .y = y};
 
