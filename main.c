@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
         }
 
         for (int i = 0; i < enemies_length; i++) {
-            update_enemy(&enemies[i], delta_time);
+            update_enemy(&enemies[i], WINDOW_WIDTH, delta_time);
 
             if (should_spawn_bullet(&enemies[i])) {
                 if (enemy_bullets_length == enemy_bullets_max) {
@@ -222,6 +222,15 @@ int main(int argc, char* argv[]) {
 
                 enemy_hit(enemies, &enemies_length, i);
                 player.can_shoot = true;
+            }
+        }
+
+        for (int i = 0; i < enemies_length; i++) {
+            if (did_hit_wall(&enemies[i], WINDOW_WIDTH)) {
+                for (int j = 0; j < enemies_length; j++) {
+                    enemies[j].xs *= -1;
+                }
+                break;
             }
         }
 
@@ -293,6 +302,7 @@ int main(int argc, char* argv[]) {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_CloseFont(fonts.pixeled);
+    TTF_CloseFont(fonts.pixeled_small);
     TTF_Quit();
     SDL_Quit();
 
