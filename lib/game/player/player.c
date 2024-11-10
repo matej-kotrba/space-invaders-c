@@ -35,16 +35,16 @@ void render_player(Player* player, SDL_Renderer* renderer) {
     SDL_RenderFillRect(renderer, &rect);
 }
 
-void update_player(Player* player, int screen_width) {
+void update_player(Player* player, int screen_width, float delta_time) {
     if (inputs.move_left_press > 0) {
-        player->x -= player->s;
+        player->x -= player->s * delta_time * 50;
         if (player->x < 0) {
             player->x = 0;
         }
     }
 
     if (inputs.move_right_press > 0) {
-        player->x += player->s;
+        player->x += player->s * delta_time * 50;
 
         if (player->x + player->w > screen_width) {
             player->x = screen_width - player->w;

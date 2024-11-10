@@ -83,10 +83,10 @@ void platform_hit(Platform* platform, Bullet* bullet) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
             if (platform->parts[i] == 0) continue;
 
-            float x = abs(bullet_xm - (platform->x + j * PLATFORM_PART_SIZE));
-            float y = abs(bullet_y2 - (platform->y + i * PLATFORM_PART_SIZE));
-            x = x == 0 ? 0 : pow(x, 2);
-            y = y == 0 ? 0 : pow(y, 2);
+            float x = fabs(bullet_xm - (platform->x + j * PLATFORM_PART_SIZE));
+            float y = fabs(bullet_y2 - (platform->y + i * PLATFORM_PART_SIZE));
+            x = x == 0 ? 0 : powf(x, 2);
+            y = y == 0 ? 0 : powf(y, 2);
 
             float c = sqrt(x + y);
 

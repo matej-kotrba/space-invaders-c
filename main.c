@@ -149,11 +149,11 @@ int main(int argc, char* argv[]) {
         update_input_attrs(&inputs);
 
         // Update cycle
-        update_player(&player, WINDOW_WIDTH);
+        update_player(&player, WINDOW_WIDTH, delta_time);
         try_shoot_player_projectile(&player);
 
         if (player.can_shoot == false) {
-            update_bullet(&player.projectile);
+            update_bullet(&player.projectile, delta_time);
         }
 
         if (should_remove_bullet(&player.projectile, WINDOW_WIDTH,
@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
         }
 
         for (int i = 0; i < enemy_bullets_length; i++) {
-            update_bullet(&enemy_bullets[i]);
+            update_bullet(&enemy_bullets[i], delta_time);
 
             if (is_bullet_on_player(&enemy_bullets[i], &player)) {
                 player_hit(&player);
@@ -207,7 +207,8 @@ int main(int argc, char* argv[]) {
                 enemy_bullets_length++;
             }
 
-            if (is_bullet_on_enemy(&player.projectile, &enemies[i])) {
+            if (player.can_shoot == false &&
+                is_bullet_on_enemy(&player.projectile, &enemies[i])) {
                 if (spread_effects_length == spread_effects_max) {
                     resize_array(spread_effects, sizeof(SpreadEffect),
                                  &spread_effects_max,

@@ -65,9 +65,8 @@ void render_enemy(Enemy* enemy, SDL_Renderer* renderer) {
 }
 
 void update_enemy(Enemy* enemy, int window_width, float delta_time) {
-    // printf("XS: %f\n", enemy->xs);
     enemy->x += enemy->xs * delta_time * 100;
-    enemy->y += enemy->ys * delta_time;
+    enemy->y += enemy->ys * delta_time * 100;
 
     if (enemy->x < 0)
         enemy->x = 0;

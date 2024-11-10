@@ -20,7 +20,7 @@ typedef struct {
 Player create_new_player(int x, int y, int w, int h);
 
 void render_player(Player*, SDL_Renderer*);
-void update_player(Player* player, int screen_width);
+void update_player(Player* player, int screen_width, float delta_time);
 void try_shoot_player_projectile(Player* player);
 void reset_player_shot(Player* player);
 void player_hit(Player* player);

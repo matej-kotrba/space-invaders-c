@@ -35,9 +35,9 @@ void render_bullet(Bullet* bullet, SDL_Renderer* renderer) {
     SDL_RenderFillRect(renderer, &rect);
 }
 
-void update_bullet(Bullet* bullet) {
-    bullet->x += bullet->xs;
-    bullet->y += bullet->ys;
+void update_bullet(Bullet* bullet, float delta_time) {
+    bullet->x += bullet->xs * delta_time * 80;
+    bullet->y += bullet->ys * delta_time * 80;
 }
 
 bool should_remove_bullet(Bullet* bullet, int window_width, int window_height) {
