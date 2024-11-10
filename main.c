@@ -9,6 +9,7 @@
 #include "lib/game/player/player.c"
 #include "lib/game/projectile/projectile.h"
 #include "lib/menu/button.c"
+#include "lib/screens/screen_handler.c"
 #include "lib/setup.c"
 #include "lib/utils.c"
 
@@ -148,138 +149,156 @@ int main(int argc, char* argv[]) {
 
         update_input_attrs(&inputs);
 
-        // Update cycle
-        update_player(&player, WINDOW_WIDTH, delta_time);
-        try_shoot_player_projectile(&player);
+        switch (get_active_screen()) {
+            case GAME:
+                // Game update cycle
+                update_player(&player, WINDOW_WIDTH, delta_time);
+                try_shoot_player_projectile(&player);
 
-        if (player.can_shoot == false) {
-            update_bullet(&player.projectile, delta_time);
-        }
-
-        if (should_remove_bullet(&player.projectile, WINDOW_WIDTH,
-                                 WINDOW_HEIGHT)) {
-            reset_player_shot(&player);
-        }
-
-        for (int i = 0; i < enemy_bullets_length; i++) {
-            update_bullet(&enemy_bullets[i], delta_time);
-
-            if (is_bullet_on_player(&enemy_bullets[i], &player)) {
-                player_hit(&player);
-                remove_element(enemy_bullets, sizeof(Bullet),
-                               &enemy_bullets_length, i);
-                i--;
-                continue;
-            }
-
-            for (int j = 0; j < PLATFORMS_COUNT; j++) {
-                if (is_bullet_on_platform(&platforms[j], &enemy_bullets[i])) {
-                    platform_hit(&platforms[j], &enemy_bullets[i]);
-                    remove_element(enemy_bullets, sizeof(Bullet),
-                                   &enemy_bullets_length, i);
-                }
-            }
-
-            if (should_remove_bullet(&enemy_bullets[i], WINDOW_WIDTH,
-                                     WINDOW_HEIGHT)) {
-                remove_element(enemy_bullets, sizeof(Bullet),
-                               &enemy_bullets_length, i);
-                i--;
-            }
-        }
-
-        for (int i = 0; i < enemies_length; i++) {
-            update_enemy(&enemies[i], WINDOW_WIDTH, delta_time);
-
-            if (should_spawn_bullet(&enemies[i])) {
-                if (enemy_bullets_length == enemy_bullets_max) {
-                    resize_array(enemy_bullets, sizeof(Bullet),
-                                 &enemy_bullets_max, ENEMY_BULLET_ALLOC_COUNT);
+                if (player.can_shoot == false) {
+                    update_bullet(&player.projectile, delta_time);
                 }
 
-                Vector2 vec = get_default_bullet_size(ENEMY);
-                enemy_bullets[enemy_bullets_length] =
-                    create_new_bullet(enemies[i].x + enemies[i].w / 2,
-                                      enemies[i].y + enemies[i].h, vec.x, vec.y,
-                                      0, get_random_float(2, 3));
-
-                enemies[i].shoot_delay = get_shoot_delay();
-                enemy_bullets_length++;
-            }
-
-            if (player.can_shoot == false &&
-                is_bullet_on_enemy(&player.projectile, &enemies[i])) {
-                if (spread_effects_length == spread_effects_max) {
-                    resize_array(spread_effects, sizeof(SpreadEffect),
-                                 &spread_effects_max,
-                                 SPREAD_EFFECTS_ALLOC_COUNT);
+                if (should_remove_bullet(&player.projectile, WINDOW_WIDTH,
+                                         WINDOW_HEIGHT)) {
+                    reset_player_shot(&player);
                 }
 
-                spread_effects[spread_effects_length] =
-                    create_new_spread_effect(enemies[i].x + enemies[i].w / 2,
-                                             enemies[i].y + enemies[i].h / 2);
+                for (int i = 0; i < enemy_bullets_length; i++) {
+                    update_bullet(&enemy_bullets[i], delta_time);
 
-                spread_effects_length++;
+                    if (is_bullet_on_player(&enemy_bullets[i], &player)) {
+                        player_hit(&player);
+                        remove_element(enemy_bullets, sizeof(Bullet),
+                                       &enemy_bullets_length, i);
+                        i--;
+                        if (player.hp <= 0) {
+                            set_active_screen(GAMEOVER);
+                        }
+                        continue;
+                    }
 
-                enemy_hit(enemies, &enemies_length, i);
-                player.can_shoot = true;
-            }
-        }
+                    for (int j = 0; j < PLATFORMS_COUNT; j++) {
+                        if (is_bullet_on_platform(&platforms[j],
+                                                  &enemy_bullets[i])) {
+                            platform_hit(&platforms[j], &enemy_bullets[i]);
+                            remove_element(enemy_bullets, sizeof(Bullet),
+                                           &enemy_bullets_length, i);
+                        }
+                    }
 
-        for (int i = 0; i < enemies_length; i++) {
-            if (did_hit_wall(&enemies[i], WINDOW_WIDTH)) {
-                for (int j = 0; j < enemies_length; j++) {
-                    enemies[j].xs *= -1;
+                    if (should_remove_bullet(&enemy_bullets[i], WINDOW_WIDTH,
+                                             WINDOW_HEIGHT)) {
+                        remove_element(enemy_bullets, sizeof(Bullet),
+                                       &enemy_bullets_length, i);
+                        i--;
+                    }
                 }
+
+                for (int i = 0; i < enemies_length; i++) {
+                    update_enemy(&enemies[i], WINDOW_WIDTH, delta_time);
+
+                    if (should_spawn_bullet(&enemies[i])) {
+                        if (enemy_bullets_length == enemy_bullets_max) {
+                            resize_array(enemy_bullets, sizeof(Bullet),
+                                         &enemy_bullets_max,
+                                         ENEMY_BULLET_ALLOC_COUNT);
+                        }
+
+                        Vector2 vec = get_default_bullet_size(ENEMY);
+                        enemy_bullets[enemy_bullets_length] = create_new_bullet(
+                            enemies[i].x + enemies[i].w / 2,
+                            enemies[i].y + enemies[i].h, vec.x, vec.y, 0,
+                            get_random_float(2, 3));
+
+                        enemies[i].shoot_delay = get_shoot_delay();
+                        enemy_bullets_length++;
+                    }
+
+                    if (player.can_shoot == false &&
+                        is_bullet_on_enemy(&player.projectile, &enemies[i])) {
+                        if (spread_effects_length == spread_effects_max) {
+                            resize_array(spread_effects, sizeof(SpreadEffect),
+                                         &spread_effects_max,
+                                         SPREAD_EFFECTS_ALLOC_COUNT);
+                        }
+
+                        spread_effects[spread_effects_length] =
+                            create_new_spread_effect(
+                                enemies[i].x + enemies[i].w / 2,
+                                enemies[i].y + enemies[i].h / 2);
+
+                        spread_effects_length++;
+
+                        enemy_hit(enemies, &enemies_length, i);
+                        player.can_shoot = true;
+                    }
+                }
+
+                for (int i = 0; i < enemies_length; i++) {
+                    if (did_hit_wall(&enemies[i], WINDOW_WIDTH)) {
+                        for (int j = 0; j < enemies_length; j++) {
+                            enemies[j].xs *= -1;
+                        }
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < spread_effects_length; i++) {
+                    update_spread_effect(&spread_effects[i], delta_time);
+                    if (should_remove_spread_effect(&spread_effects[i])) {
+                        free(spread_effects->particles);
+                        remove_element(spread_effects, sizeof(SpreadEffect),
+                                       &spread_effects_length, i);
+                        i--;
+                    }
+                }
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderClear(renderer);
+
+                // Render effects
+                for (int i = 0; i < spread_effects_length; i++) {
+                    render_spread_effect(&spread_effects[i], renderer);
+                }
+
+                // Render Characters
+                for (int i = 0; i < enemies_length; i++) {
+                    render_enemy(&(enemies[i]), renderer);
+                }
+
+                for (int i = 0; i < enemy_bullets_length; i++) {
+                    render_bullet(&enemy_bullets[i], renderer);
+                }
+
+                for (int i = 0; i < PLATFORMS_COUNT; i++) {
+                    render_platform(&platforms[i], renderer);
+                }
+
+                render_player(&player, renderer);
+
+                // Render projectiles
+                if (player.can_shoot == false) {
+                    render_bullet(&player.projectile, renderer);
+                }
+
+                player_display_hp(&player, renderer, WINDOW_WIDTH / 2 + 20, 10,
+                                  WINDOW_WIDTH / 2 - 40);
+
+                SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+                char score_text[20];
+                sprintf(score_text, "Score: %d", score);
+                render_text(renderer, fonts.pixeled_small, 10, 0, c,
+                            score_text);
                 break;
-            }
+
+            case GAMEOVER:
+                render_gameover_screen(renderer, score, WINDOW_WIDTH,
+                                       WINDOW_HEIGHT);
+                break;
+            default:
+                break;
         }
-
-        for (int i = 0; i < spread_effects_length; i++) {
-            update_spread_effect(&spread_effects[i], delta_time);
-            if (should_remove_spread_effect(&spread_effects[i])) {
-                free(spread_effects->particles);
-                remove_element(spread_effects, sizeof(SpreadEffect),
-                               &spread_effects_length, i);
-                i--;
-            }
-        }
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-
-        // Render effects
-        for (int i = 0; i < spread_effects_length; i++) {
-            render_spread_effect(&spread_effects[i], renderer);
-        }
-
-        // Render Characters
-        for (int i = 0; i < enemies_length; i++) {
-            render_enemy(&(enemies[i]), renderer);
-        }
-
-        for (int i = 0; i < enemy_bullets_length; i++) {
-            render_bullet(&enemy_bullets[i], renderer);
-        }
-
-        for (int i = 0; i < PLATFORMS_COUNT; i++) {
-            render_platform(&platforms[i], renderer);
-        }
-
-        render_player(&player, renderer);
-
-        // Render projectiles
-        if (player.can_shoot == false) {
-            render_bullet(&player.projectile, renderer);
-        }
-
-        player_display_hp(&player, renderer, WINDOW_WIDTH / 2 + 20, 10,
-                          WINDOW_WIDTH / 2 - 40);
-
-        SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
-        char score_text[20];
-        sprintf(score_text, "Score: %d", score);
-        render_text(renderer, fonts.pixeled_small, 10, 0, c, score_text);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         // draw_circle(renderer, 300, 500, 10);

@@ -31,6 +31,8 @@ void sdl_draw_text(SDL_Renderer*, TTF_Font*, SDL_Color, SDL_Rect, const char*);
 void draw_triangle(SDL_Renderer*, int, int, int, int, int, int);
 void draw_circle(SDL_Renderer* renderer, int center_x, int center_y,
                  float radius);
+
+Vector2 get_text_size(TTF_Font* font, const char* text);
 void render_text(SDL_Renderer* renderer, TTF_Font* font, int x, int y,
                  SDL_Color c, const char* text);
 

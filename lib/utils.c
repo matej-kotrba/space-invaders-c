@@ -15,6 +15,12 @@ void update_input_attrs(Inputs* inputs) {
     inputs->move_right_press += 1 * inputs->move_right_press;
 }
 
+Vector2 new_vec2(int x, int y) {
+    Vector2 vec = {.x = x, .y = y};
+
+    return vec;
+}
+
 void sdl_draw_text(SDL_Renderer* renderer, TTF_Font* font, SDL_Color color,
                    SDL_Rect location, const char* text) {
     // Vykreslení textu se zadaným fontem a barvou do obrázku (surface)
@@ -65,25 +71,25 @@ void draw_circle(SDL_Renderer* renderer, int center_x, int center_y,
                        center_x + radius, center_y);
 }
 
-void render_text(SDL_Renderer* renderer, TTF_Font* font, int x, int y,
-                 SDL_Color c, const char* text) {
+Vector2 get_text_size(TTF_Font* font, const char* text) {
     int text_w, text_h;
 
     TTF_SizeText(font, text, &text_w, &text_h);
 
-    SDL_Rect border_rect = {.x = x, .y = y, .w = text_w, .h = text_h};
+    return new_vec2(text_w, text_h);
+}
+
+void render_text(SDL_Renderer* renderer, TTF_Font* font, int x, int y,
+                 SDL_Color c, const char* text) {
+    Vector2 sizes = get_text_size(font, text);
+
+    SDL_Rect border_rect = {.x = x, .y = y, .w = sizes.x, .h = sizes.y};
 
     SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
 
-    SDL_Rect text_rect = {.x = x, .y = y, .w = text_w, .h = text_h};
+    SDL_Rect text_rect = {.x = x, .y = y, .w = sizes.x, .h = sizes.y};
 
     sdl_draw_text(renderer, font, c, text_rect, text);
-}
-
-Vector2 new_vec2(int x, int y) {
-    Vector2 vec = {.x = x, .y = y};
-
-    return vec;
 }
 
 float get_random_float(float min, float max) {
