@@ -14,6 +14,7 @@ typedef struct {
     int h;
     float xs;
     float ys;
+    bool should_delete;
 } Bullet;
 
 Bullet create_new_bullet(float x, float y, int w, int h, float xs, float ys);

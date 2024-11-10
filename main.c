@@ -166,15 +166,27 @@ int main(int argc, char* argv[]) {
 
                 for (int i = 0; i < enemy_bullets_length; i++) {
                     update_bullet(&enemy_bullets[i], delta_time);
+                }
 
+                for (int i = 0; i < enemy_bullets_length; i++) {
                     if (is_bullet_on_player(&enemy_bullets[i], &player)) {
                         player_hit(&player);
-                        remove_element(enemy_bullets, sizeof(Bullet),
-                                       &enemy_bullets_length, i);
-                        i--;
+                        // remove_element(enemy_bullets, sizeof(Bullet),
+                        //                &enemy_bullets_length, i);
+                        // i--;
+                        enemy_bullets[i].should_delete = true;
                         if (player.hp <= 0) {
                             set_active_screen(GAMEOVER);
                         }
+                        continue;
+                    }
+
+                    if (should_remove_bullet(&enemy_bullets[i], WINDOW_WIDTH,
+                                             WINDOW_HEIGHT)) {
+                        // remove_element(enemy_bullets, sizeof(Bullet),
+                        //                &enemy_bullets_length, i);
+                        // i--;
+                        enemy_bullets[i].should_delete = true;
                         continue;
                     }
 
@@ -182,16 +194,11 @@ int main(int argc, char* argv[]) {
                         if (is_bullet_on_platform(&platforms[j],
                                                   &enemy_bullets[i])) {
                             platform_hit(&platforms[j], &enemy_bullets[i]);
-                            remove_element(enemy_bullets, sizeof(Bullet),
-                                           &enemy_bullets_length, i);
+                            // remove_element(enemy_bullets, sizeof(Bullet),
+                            //                &enemy_bullets_length, i);
+                            // i--;
+                            enemy_bullets[i].should_delete = true;
                         }
-                    }
-
-                    if (should_remove_bullet(&enemy_bullets[i], WINDOW_WIDTH,
-                                             WINDOW_HEIGHT)) {
-                        remove_element(enemy_bullets, sizeof(Bullet),
-                                       &enemy_bullets_length, i);
-                        i--;
                     }
                 }
 
@@ -214,24 +221,30 @@ int main(int argc, char* argv[]) {
                         enemies[i].shoot_delay = get_shoot_delay();
                         enemy_bullets_length++;
                     }
+                }
 
-                    if (player.can_shoot == false &&
-                        is_bullet_on_enemy(&player.projectile, &enemies[i])) {
-                        if (spread_effects_length == spread_effects_max) {
-                            resize_array(spread_effects, sizeof(SpreadEffect),
-                                         &spread_effects_max,
-                                         SPREAD_EFFECTS_ALLOC_COUNT);
+                if (player.can_shoot == false) {
+                    for (int i = 0; i < enemies_length; i++) {
+                        if (is_bullet_on_enemy(&player.projectile,
+                                               &enemies[i])) {
+                            if (spread_effects_length == spread_effects_max) {
+                                resize_array(spread_effects,
+                                             sizeof(SpreadEffect),
+                                             &spread_effects_max,
+                                             SPREAD_EFFECTS_ALLOC_COUNT);
+                            }
+
+                            spread_effects[spread_effects_length] =
+                                create_new_spread_effect(
+                                    enemies[i].x + enemies[i].w / 2,
+                                    enemies[i].y + enemies[i].h / 2);
+
+                            spread_effects_length++;
+
+                            enemy_hit(enemies, &enemies_length, i);
+                            player.can_shoot = true;
+                            i--;
                         }
-
-                        spread_effects[spread_effects_length] =
-                            create_new_spread_effect(
-                                enemies[i].x + enemies[i].w / 2,
-                                enemies[i].y + enemies[i].h / 2);
-
-                        spread_effects_length++;
-
-                        enemy_hit(enemies, &enemies_length, i);
-                        player.can_shoot = true;
                     }
                 }
 
@@ -254,6 +267,13 @@ int main(int argc, char* argv[]) {
                         remove_element(spread_effects, sizeof(SpreadEffect),
                                        &spread_effects_length, i);
                         i--;
+                    }
+                }
+
+                for (int i = 0; i < enemy_bullets_length; i++) {
+                    if (enemy_bullets[i].should_delete) {
+                        remove_element(enemy_bullets, sizeof(Bullet),
+                                       &enemy_bullets_length, i);
                     }
                 }
 
@@ -309,7 +329,6 @@ int main(int argc, char* argv[]) {
         // SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
         // render_button(renderer, fonts.pixeled, 100, 100, c, "New game");
 
-        // Zobraz vykreslené prvky na obrazovku
         SDL_RenderPresent(renderer);
     }
 

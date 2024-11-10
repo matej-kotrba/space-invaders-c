@@ -9,7 +9,13 @@
 #include "../player/player.h"
 
 Bullet create_new_bullet(float x, float y, int w, int h, float xs, float ys) {
-    Bullet bul = {.x = x, .y = y, .w = w, .h = h, .xs = xs, .ys = ys};
+    Bullet bul = {.x = x,
+                  .y = y,
+                  .w = w,
+                  .h = h,
+                  .xs = xs,
+                  .ys = ys,
+                  .should_delete = false};
 
     return bul;
 }
