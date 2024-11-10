@@ -12,8 +12,8 @@
 #define PLATFORM_TEMPLATE_ROWS 18
 #define PLATFORM_TEMPLATE_COLUMNS 20
 #define PLATFORM_PART_SIZE 4
-#define PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD 3
-#define PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD 6
+#define PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD 2
+#define PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD 4
 
 static int platform_template[PLATFORM_TEMPLATE_ROWS *
                              (PLATFORM_TEMPLATE_COLUMNS / 2)] = {
@@ -81,22 +81,22 @@ void platform_hit(Platform* platform, Bullet* bullet) {
 
     for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
-            if (platform->parts[i] == 0) continue;
+            if (platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] == 0)
+                continue;
 
-            float x = fabs(bullet_xm - (platform->x + j * PLATFORM_PART_SIZE));
-            float y = fabs(bullet_y2 - (platform->y + i * PLATFORM_PART_SIZE));
-            x = x == 0 ? 0 : powf(x, 2);
-            y = y == 0 ? 0 : powf(y, 2);
+            float x = bullet_xm - (platform->x + j * PLATFORM_PART_SIZE);
+            float y = bullet_y2 - (platform->y + i * PLATFORM_PART_SIZE);
+            x = x * x;
+            y = y * y;
 
             float c = sqrt(x + y);
 
-            // printf("%f\n", c / PLATFORM_PART_SIZE);
-
-            if (c <= PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD *
-                         PLATFORM_PART_SIZE ||
-                (c <= PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD *
-                          PLATFORM_PART_SIZE &&
-                 round(get_random_float(0, 1)))) {
+            if (c <=
+                PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD * PLATFORM_PART_SIZE) {
+                platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] = 0;
+            } else if (c <= PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD *
+                                PLATFORM_PART_SIZE &&
+                       round(get_random_float(0, 1))) {
                 platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] = 0;
             }
         }
@@ -111,6 +111,8 @@ bool is_bullet_on_platform(Platform* platform, Bullet* bullet) {
         return false;
     for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
+            if (platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] == 0)
+                continue;
             if (is_rect_on_rect(platform->x + j * PLATFORM_PART_SIZE,
                                 platform->y + i * PLATFORM_PART_SIZE,
                                 PLATFORM_PART_SIZE, PLATFORM_PART_SIZE,
