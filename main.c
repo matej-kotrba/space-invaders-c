@@ -52,8 +52,8 @@ int main(int argc, char* argv[]) {
     // Game objects
     int score = 0;
 
-    Player player =
-        create_new_player(WINDOW_WIDTH / 2 - 25, WINDOW_HEIGHT - 100, 50, 50);
+    Player player = create_new_player((float)(WINDOW_WIDTH / 2 - 25),
+                                      (float)(WINDOW_HEIGHT - 100), 50, 50);
 
     int enemies_length = ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
     Enemy enemies[ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH];
@@ -236,9 +236,12 @@ int main(int argc, char* argv[]) {
                 }
 
                 for (int i = 0; i < enemies_length; i++) {
-                    if (did_hit_wall(&enemies[i], WINDOW_WIDTH)) {
+                    float offset =
+                        get_offset_over_border(&enemies[i], WINDOW_WIDTH);
+                    if (offset != 0) {
                         for (int j = 0; j < enemies_length; j++) {
                             enemies[j].xs *= -1;
+                            enemies[j].x += -offset;
                         }
                         break;
                     }

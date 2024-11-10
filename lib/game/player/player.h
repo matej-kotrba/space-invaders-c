@@ -6,18 +6,18 @@
 #include "../projectile/projectile.h"
 
 typedef struct {
-    int x;
-    int y;
+    float x;
+    float y;
     int w;
     int h;
     int hp;
     int max_hp;
-    int s;
+    float s;
     bool can_shoot;
     Bullet projectile;
 } Player;
 
-Player create_new_player(int x, int y, int w, int h);
+Player create_new_player(float x, float y, int w, int h);
 
 void render_player(Player*, SDL_Renderer*);
 void update_player(Player* player, int screen_width, float delta_time);

@@ -7,11 +7,11 @@
 #include "../projectile/projectile.c"
 
 #define PLAYER_DEFAULT_HP 3
-#define PLAYER_DEFAULT_SPEED 5
+#define PLAYER_DEFAULT_SPEED 200.0
 
 #define PLAYER_HP_DISPLAY_GAP 10
 
-Player create_new_player(int x, int y, int w, int h) {
+Player create_new_player(float x, float y, int w, int h) {
     Player new_player = {
         .x = x,
         .y = y,
@@ -37,17 +37,17 @@ void render_player(Player* player, SDL_Renderer* renderer) {
 
 void update_player(Player* player, int screen_width, float delta_time) {
     if (inputs.move_left_press > 0) {
-        player->x -= player->s * delta_time * 50;
+        player->x -= player->s * delta_time;
         if (player->x < 0) {
             player->x = 0;
         }
     }
 
     if (inputs.move_right_press > 0) {
-        player->x += player->s * delta_time * 50;
+        player->x += player->s * delta_time;
 
-        if (player->x + player->w > screen_width) {
-            player->x = screen_width - player->w;
+        if (player->x + player->w > (float)screen_width) {
+            player->x = (float)screen_width - player->w;
         }
     }
 }

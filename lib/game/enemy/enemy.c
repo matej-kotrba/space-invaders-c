@@ -38,7 +38,7 @@ void create_enemy_grid(Enemy* arr, int starting_x, int starting_y) {
                         .y = starting_y};
             arr[i * ENEMY_GRID_ROW_LENGTH + j] = create_new_enemy(
                 starting_x + j * ENEMY_WIDTH + j * ENEMY_GAP_VALUE,
-                starting_y + i * ENEMY_HEIGHT + i * ENEMY_GAP_VALUE, 0.5, 0,
+                starting_y + i * ENEMY_HEIGHT + i * ENEMY_GAP_VALUE, 1, 0,
                 i == 0 ? SHOOTER : BLOCKER);
         }
     }
@@ -65,19 +65,20 @@ void render_enemy(Enemy* enemy, SDL_Renderer* renderer) {
 }
 
 void update_enemy(Enemy* enemy, int window_width, float delta_time) {
-    enemy->x += enemy->xs * delta_time * 100;
-    enemy->y += enemy->ys * delta_time * 100;
-
-    if (enemy->x < 0)
-        enemy->x = 0;
-    else if (enemy->x > window_width)
-        enemy->x = window_width;
+    enemy->x += enemy->xs * delta_time * 50.0;
+    enemy->y += enemy->ys * delta_time * 50.0;
 
     enemy->shoot_delay -= delta_time * 1000;
 }
 
-bool did_hit_wall(Enemy* enemy, int window_width) {
-    return enemy->x <= 0 || enemy->x + enemy->w >= window_width;
+float get_offset_over_border(Enemy* enemy, int window_width) {
+    if (enemy->x < 0) {
+        return enemy->x;
+    } else if (enemy->x + enemy->w > (float)window_width) {
+        return enemy->x + enemy->w - (float)window_width;
+    } else {
+        return 0.0;
+    }
 }
 
 void enemy_hit(Enemy* enemies, int* enemies_length, int enemy_index_to_delete) {
