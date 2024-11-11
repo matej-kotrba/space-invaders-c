@@ -22,6 +22,8 @@
 
 #define PLATFORMS_COUNT 3
 
+#define ENEMY_SCORE 10
+
 int main(int argc, char* argv[]) {
     // SDL init
     SDL_Init(SDL_INIT_VIDEO);
@@ -62,7 +64,6 @@ int main(int argc, char* argv[]) {
                                             ENEMY_WIDTH, ENEMY_GAP_VALUE),
                       50);
 
-    Bullet player_bullet;
     bool can_player_shoot = true;
 
     int enemy_bullets_length = 0;
@@ -164,6 +165,19 @@ int main(int argc, char* argv[]) {
                     reset_player_shot(&player);
                 }
 
+                if (player.can_shoot == false) {
+                    for (int i = 0; i < PLATFORMS_COUNT; i++) {
+                        if (is_bullet_on_platform(&platforms[i],
+                                                  &player.projectile)) {
+                            int index = get_platform_bullet_hit_part_index(
+                                &platforms[i], &player.projectile);
+                            platform_hit(&platforms[i], &player.projectile,
+                                         index);
+                            reset_player_shot(&player);
+                        }
+                    }
+                }
+
                 for (int i = 0; i < enemy_bullets_length; i++) {
                     update_bullet(&enemy_bullets[i], delta_time);
                 }
@@ -193,7 +207,10 @@ int main(int argc, char* argv[]) {
                     for (int j = 0; j < PLATFORMS_COUNT; j++) {
                         if (is_bullet_on_platform(&platforms[j],
                                                   &enemy_bullets[i])) {
-                            platform_hit(&platforms[j], &enemy_bullets[i]);
+                            int index = get_platform_bullet_hit_part_index(
+                                &platforms[j], &enemy_bullets[i]);
+                            platform_hit(&platforms[j], &enemy_bullets[i],
+                                         index);
                             // remove_element(enemy_bullets, sizeof(Bullet),
                             //                &enemy_bullets_length, i);
                             // i--;

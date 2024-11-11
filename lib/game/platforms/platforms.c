@@ -75,17 +75,22 @@ void render_platform(Platform* platform, SDL_Renderer* renderer) {
     }
 }
 
-void platform_hit(Platform* platform, Bullet* bullet) {
-    int bullet_xm = bullet->x + bullet->w / 2;
-    int bullet_y2 = bullet->y + bullet->h;
+void platform_hit(Platform* platform, Bullet* bullet, size_t index) {
+    // int bullet_xm = bullet->x + bullet->w / 2;
+    // int bullet_y2 = bullet->y + bullet->h;
+
+    int hit_part_xm =
+        platform->x + (index % PLATFORM_TEMPLATE_COLUMNS) * PLATFORM_PART_SIZE;
+    int hit_part_ym =
+        platform->y + (index / PLATFORM_TEMPLATE_COLUMNS) * PLATFORM_PART_SIZE;
 
     for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
             if (platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] == 0)
                 continue;
 
-            float x = bullet_xm - (platform->x + j * PLATFORM_PART_SIZE);
-            float y = bullet_y2 - (platform->y + i * PLATFORM_PART_SIZE);
+            float x = hit_part_xm - (platform->x + j * PLATFORM_PART_SIZE);
+            float y = hit_part_ym - (platform->y + i * PLATFORM_PART_SIZE);
             x = x * x;
             y = y * y;
 
@@ -109,6 +114,7 @@ bool is_bullet_on_platform(Platform* platform, Bullet* bullet) {
                          PLATFORM_TEMPLATE_ROWS * PLATFORM_PART_SIZE, bullet->x,
                          bullet->y, bullet->w, bullet->h))
         return false;
+
     for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
             if (platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] == 0)
@@ -123,4 +129,21 @@ bool is_bullet_on_platform(Platform* platform, Bullet* bullet) {
     }
 
     return false;
+}
+
+int get_platform_bullet_hit_part_index(Platform* platform, Bullet* bullet) {
+    for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
+        for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
+            if (platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] == 0)
+                continue;
+            if (is_rect_on_rect(platform->x + j * PLATFORM_PART_SIZE,
+                                platform->y + i * PLATFORM_PART_SIZE,
+                                PLATFORM_PART_SIZE, PLATFORM_PART_SIZE,
+                                bullet->x, bullet->y, bullet->w, bullet->h)) {
+                return i * PLATFORM_TEMPLATE_COLUMNS + j;
+            }
+        }
+    }
+
+    return -1;
 }
