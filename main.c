@@ -167,14 +167,11 @@ int main(int argc, char* argv[]) {
 
                 if (player.can_shoot == false) {
                     for (int i = 0; i < PLATFORMS_COUNT; i++) {
-                        if (is_bullet_on_platform(&platforms[i],
-                                                  &player.projectile)) {
-                            int index = get_platform_bullet_hit_part_index(
-                                &platforms[i], &player.projectile);
-                            platform_hit(&platforms[i], &player.projectile,
-                                         index);
-                            reset_player_shot(&player);
-                        }
+                        int index = get_platform_bullet_hit_part_index(
+                            &platforms[i], &player.projectile);
+                        if (index == -1) continue;
+                        platform_hit(&platforms[i], &player.projectile, index);
+                        reset_player_shot(&player);
                     }
                 }
 
@@ -185,9 +182,6 @@ int main(int argc, char* argv[]) {
                 for (int i = 0; i < enemy_bullets_length; i++) {
                     if (is_bullet_on_player(&enemy_bullets[i], &player)) {
                         player_hit(&player);
-                        // remove_element(enemy_bullets, sizeof(Bullet),
-                        //                &enemy_bullets_length, i);
-                        // i--;
                         enemy_bullets[i].should_delete = true;
                         if (player.hp <= 0) {
                             set_active_screen(GAMEOVER);
@@ -197,25 +191,16 @@ int main(int argc, char* argv[]) {
 
                     if (should_remove_bullet(&enemy_bullets[i], WINDOW_WIDTH,
                                              WINDOW_HEIGHT)) {
-                        // remove_element(enemy_bullets, sizeof(Bullet),
-                        //                &enemy_bullets_length, i);
-                        // i--;
                         enemy_bullets[i].should_delete = true;
                         continue;
                     }
 
                     for (int j = 0; j < PLATFORMS_COUNT; j++) {
-                        if (is_bullet_on_platform(&platforms[j],
-                                                  &enemy_bullets[i])) {
-                            int index = get_platform_bullet_hit_part_index(
-                                &platforms[j], &enemy_bullets[i]);
-                            platform_hit(&platforms[j], &enemy_bullets[i],
-                                         index);
-                            // remove_element(enemy_bullets, sizeof(Bullet),
-                            //                &enemy_bullets_length, i);
-                            // i--;
-                            enemy_bullets[i].should_delete = true;
-                        }
+                        int index = get_platform_bullet_hit_part_index(
+                            &platforms[j], &enemy_bullets[i]);
+                        if (index == -1) continue;
+                        platform_hit(&platforms[j], &enemy_bullets[i], index);
+                        enemy_bullets[i].should_delete = true;
                     }
                 }
 
@@ -260,6 +245,8 @@ int main(int argc, char* argv[]) {
 
                             enemy_hit(enemies, &enemies_length, i);
                             player.can_shoot = true;
+                            score += ENEMY_SCORE;
+
                             i--;
                         }
                     }

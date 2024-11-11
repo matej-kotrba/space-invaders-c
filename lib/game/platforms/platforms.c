@@ -132,6 +132,12 @@ bool is_bullet_on_platform(Platform* platform, Bullet* bullet) {
 }
 
 int get_platform_bullet_hit_part_index(Platform* platform, Bullet* bullet) {
+    if (!is_rect_on_rect(platform->x, platform->y,
+                         PLATFORM_TEMPLATE_COLUMNS * PLATFORM_PART_SIZE,
+                         PLATFORM_TEMPLATE_ROWS * PLATFORM_PART_SIZE, bullet->x,
+                         bullet->y, bullet->w, bullet->h))
+        return -1;
+
     for (int i = 0; i < PLATFORM_TEMPLATE_ROWS; i++) {
         for (int j = 0; j < PLATFORM_TEMPLATE_COLUMNS; j++) {
             if (platform->parts[i * PLATFORM_TEMPLATE_COLUMNS + j] == 0)
