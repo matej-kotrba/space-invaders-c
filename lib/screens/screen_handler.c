@@ -13,6 +13,19 @@ Screen get_active_screen() { return active_screen; }
 
 void set_active_screen(Screen new_screen) { active_screen = new_screen; }
 
+void init_screen(Screen screen, ScreenProperties* sp) {
+    switch (screen) {
+        case GAMEOVER:
+            init_gameover_screen(sp);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void init_gameover_screen() {}
+
 void render_gameover_screen(SDL_Renderer* renderer, int score, int window_width,
                             int window_height) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

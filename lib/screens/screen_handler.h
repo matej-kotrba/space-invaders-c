@@ -2,11 +2,13 @@
 
 #include <SDL2/SDL.h>
 
-typedef enum {
-  MENU,
-  GAME,
-  GAMEOVER
-} Screen;
+typedef enum { MENU, GAME, GAMEOVER } Screen;
+
+typedef struct {
+    Button* buttons;
+    int buttons_len;
+    int buttons_max;
+} ScreenProperties;
 
 Screen get_active_screen();
 void set_active_screen(Screen new_screen);

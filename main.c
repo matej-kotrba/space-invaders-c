@@ -152,6 +152,7 @@ int main(int argc, char* argv[]) {
         update_input_attrs(&inputs);
 
         SDL_SetCursor(cursors.def);
+        SDL_SetCursor(cursors.pointer);
 
         switch (get_active_screen()) {
             case GAME:

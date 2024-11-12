@@ -3,5 +3,13 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-void render_button(SDL_Renderer* renderer, TTF_Font* font, int x, int y,
-                   SDL_Color c, const char* text);
+typedef struct {
+    int x;
+    int y;
+    TTF_Font* font;
+    SDL_Color c;
+    const char* text;
+} Button;
+
+Button create_new_button(int x, int y, TTF_Font* font, const char* text);
+void render_button(Button* this, SDL_Renderer* renderer);
