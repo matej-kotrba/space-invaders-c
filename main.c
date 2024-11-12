@@ -50,6 +50,7 @@ int main(int argc, char* argv[]) {
     float delta_time;
 
     Fonts fonts = get_fonts();
+    Cursors cursors = get_cursors();
 
     // Game objects
     int score = 0;

@@ -11,3 +11,10 @@ Fonts get_fonts() {
 
     return fonts;
 }
+
+Cursors get_cursors() {
+    Cursors cursors = {.pointer =
+                           SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND)};
+
+    return cursors;
+}
