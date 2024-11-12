@@ -151,6 +151,8 @@ int main(int argc, char* argv[]) {
 
         update_input_attrs(&inputs);
 
+        SDL_SetCursor(cursors.def);
+
         switch (get_active_screen()) {
             case GAME:
                 // Game update cycle

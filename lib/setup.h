@@ -9,6 +9,7 @@ typedef struct {
 } Fonts;
 
 typedef struct {
+    SDL_Cursor* def;
     SDL_Cursor* pointer;
 } Cursors;
 

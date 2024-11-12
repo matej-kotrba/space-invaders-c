@@ -13,8 +13,9 @@ Fonts get_fonts() {
 }
 
 Cursors get_cursors() {
-    Cursors cursors = {.pointer =
-                           SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND)};
+    Cursors cursors = {
+        .def = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW),
+        .pointer = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND)};
 
     return cursors;
 }
