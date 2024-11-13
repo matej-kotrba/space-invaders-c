@@ -52,6 +52,10 @@ int main(int argc, char* argv[]) {
     Fonts fonts = get_fonts();
     Cursors cursors = get_cursors();
 
+    ScreenProperties screen_properties;
+    init_screen(get_active_screen(), &screen_properties, WINDOW_WIDTH,
+                WINDOW_HEIGHT);
+
     // Game objects
     int score = 0;
 
@@ -188,7 +192,8 @@ int main(int argc, char* argv[]) {
                         player_hit(&player);
                         enemy_bullets[i].should_delete = true;
                         if (player.hp <= 0) {
-                            set_active_screen(GAMEOVER);
+                            set_active_screen(GAMEOVER, &screen_properties,
+                                              WINDOW_WIDTH, WINDOW_HEIGHT);
                         }
                         continue;
                     }
@@ -324,8 +329,8 @@ int main(int argc, char* argv[]) {
                 break;
 
             case GAMEOVER:
-                render_gameover_screen(renderer, score, WINDOW_WIDTH,
-                                       WINDOW_HEIGHT);
+                render_gameover_screen(renderer, &screen_properties, score,
+                                       WINDOW_WIDTH, WINDOW_HEIGHT);
                 break;
             default:
                 break;
@@ -349,6 +354,7 @@ int main(int argc, char* argv[]) {
         free(spread_effects[i].particles);
     }
     free(spread_effects);
+    free(screen_properties.buttons);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_CloseFont(fonts.pixeled);

@@ -6,8 +6,9 @@
 #include "../setup.h"
 #include "../utils.h"
 
-Button create_new_button(int x, int y, TTF_Font* font, const char* text) {
-    Button b = {.x = x, .y = y, .font = font, .text = text};
+Button create_new_button(int x, int y, TTF_Font* font, SDL_Color c,
+                         const char* text) {
+    Button b = {.x = x, .y = y, .font = font, .c = c, .text = text};
     return b;
 }
 
