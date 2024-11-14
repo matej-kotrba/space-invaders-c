@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
     Cursors cursors = get_cursors();
 
     ScreenProperties screen_properties;
-    init_screen(get_active_screen(), &screen_properties, WINDOW_WIDTH,
+    init_screen(get_active_screen(), &screen_properties, &fonts, WINDOW_WIDTH,
                 WINDOW_HEIGHT);
 
     // Game objects
@@ -155,8 +155,10 @@ int main(int argc, char* argv[]) {
 
         update_input_attrs(&inputs);
 
-        SDL_SetCursor(cursors.def);
-        SDL_SetCursor(cursors.pointer);
+        // SDL_SetCursor(cursors.def);
+        // SDL_SetCursor(cursors.pointer);
+
+        screen_properties.cursor = cursors.def;
 
         switch (get_active_screen()) {
             case GAME:
@@ -193,7 +195,8 @@ int main(int argc, char* argv[]) {
                         enemy_bullets[i].should_delete = true;
                         if (player.hp <= 0) {
                             set_active_screen(GAMEOVER, &screen_properties,
-                                              WINDOW_WIDTH, WINDOW_HEIGHT);
+                                              &fonts, WINDOW_WIDTH,
+                                              WINDOW_HEIGHT);
                         }
                         continue;
                     }
@@ -329,12 +332,15 @@ int main(int argc, char* argv[]) {
                 break;
 
             case GAMEOVER:
-                render_gameover_screen(renderer, &screen_properties, score,
-                                       WINDOW_WIDTH, WINDOW_HEIGHT);
+                render_gameover_screen(renderer, &screen_properties, &fonts,
+                                       &cursors, score, WINDOW_WIDTH,
+                                       WINDOW_HEIGHT);
                 break;
             default:
                 break;
         }
+
+        SDL_SetCursor(screen_properties.cursor);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         // draw_circle(renderer, 300, 500, 10);

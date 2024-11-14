@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "../screens/screen_handler.h"
 #include "../setup.h"
 #include "../utils.h"
 
@@ -12,7 +13,8 @@ Button create_new_button(int x, int y, TTF_Font* font, SDL_Color c,
     return b;
 }
 
-void render_button(Button* this, SDL_Renderer* renderer) {
+void render_button(Button* this, SDL_Renderer* renderer, SDL_Cursor** cursor,
+                   Cursors* cursors) {
     const int BORDER_MARGIN = 15;
     int text_w, text_h;
 
@@ -28,8 +30,9 @@ void render_button(Button* this, SDL_Renderer* renderer) {
 
     if (is_point_over_rect(&inputs.mouse_pos, &border_rect)) {
         SDL_RenderDrawRect(renderer, &border_rect);
-        SDL_Cursor* pointer = get_cursors().pointer;
-        SDL_SetCursor(pointer);
+        *cursor = cursors->pointer;
+        // SDL_Cursor* pointer = get_cursors().pointer;
+        // SDL_SetCursor(pointer);
     }
 
     SDL_Rect text_rect = {.x = this->x, .y = this->y, .w = text_w, .h = text_h};
