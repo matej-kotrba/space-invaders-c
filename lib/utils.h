@@ -9,13 +9,8 @@ typedef struct {
 } Vector2;
 
 typedef struct {
-    int x;
-    int y;
-} MousePosition;
-
-typedef struct {
-    MousePosition last_mouse_pos;
-    MousePosition mouse_pos;
+    Vector2 last_mouse_pos;
+    Vector2 mouse_pos;
     float leftmouse_click;
     float move_left_press;
     float move_right_press;

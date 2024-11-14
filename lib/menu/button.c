@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <stdbool.h>
 
 #include "../screens/screen_handler.h"
 #include "../setup.h"
@@ -31,11 +32,13 @@ void render_button(Button* this, SDL_Renderer* renderer, SDL_Cursor** cursor,
     if (is_point_over_rect(&inputs.mouse_pos, &border_rect)) {
         SDL_RenderDrawRect(renderer, &border_rect);
         *cursor = cursors->pointer;
-        // SDL_Cursor* pointer = get_cursors().pointer;
-        // SDL_SetCursor(pointer);
     }
 
     SDL_Rect text_rect = {.x = this->x, .y = this->y, .w = text_w, .h = text_h};
 
     sdl_draw_text(renderer, this->font, this->c, text_rect, this->text);
 }
+
+// bool was_button_clicked(Button* this, Vector2 mouse_position) {
+//     return is_point_over_rect(&inputs.mouse_pos, &border_rect)
+// }
