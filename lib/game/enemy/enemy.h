@@ -5,6 +5,15 @@
 
 #include "../projectile/projectile.h"
 
+#define ENEMY_WIDTH 50
+#define ENEMY_HEIGHT 40
+
+#define ENEMY_GRID_ROW_LENGTH 10
+#define ENEMY_GRID_COLUMN_LENGTH 5
+#define ENEMY_GAP_VALUE 10
+
+#define SHOOTER_SHOOT_INVERVAL_MS 3000
+
 typedef enum { BLOCKER, SHOOTER } EnemyType;
 
 typedef struct {

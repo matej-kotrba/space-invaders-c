@@ -3,26 +3,18 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "lib/game/effects/effects.c"
-#include "lib/game/enemy/enemy.c"
-#include "lib/game/platforms/platforms.c"
-#include "lib/game/player/player.c"
+#include "lib/game/effects/effects.h"
+#include "lib/game/enemy/enemy.h"
+#include "lib/game/platforms/platforms.h"
+#include "lib/game/player/player.h"
 #include "lib/game/projectile/projectile.h"
-#include "lib/menu/button.c"
-#include "lib/screens/screen_handler.c"
-#include "lib/setup.c"
-#include "lib/utils.c"
+#include "lib/menu/button.h"
+#include "lib/screens/screen_handler.h"
+#include "lib/setup.h"
+#include "lib/utils.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
-
-// Game
-#define ENEMY_BULLET_ALLOC_COUNT 10
-#define SPREAD_EFFECTS_ALLOC_COUNT 5
-
-#define PLATFORMS_COUNT 3
-
-#define ENEMY_SCORE 10
 
 int main(int argc, char* argv[]) {
     // SDL init
