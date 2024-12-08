@@ -1,5 +1,5 @@
 cmake -B build
 cd build
 make
-./space-invaders
+./space_invaders
 cd ..

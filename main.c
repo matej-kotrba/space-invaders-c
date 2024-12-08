@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     screen_properties.cursors = &cursors;
 
     GameProperties game_properties;
-    restart_game_fn(&game_properties);
+    // restart_game_fn(&game_properties);
 
     GameParams game_params = {.gp = &game_properties, .sp = &screen_properties};
 

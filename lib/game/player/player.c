@@ -2,9 +2,9 @@
 
 #include <SDL2/SDL.h>
 
-#include "../../hitboxes.c"
+#include "../../hitboxes.h"
 #include "../../utils.h"
-#include "../projectile/projectile.c"
+#include "../projectile/projectile.h"
 
 #define PLAYER_DEFAULT_HP 3
 #define PLAYER_DEFAULT_SPEED 200.0

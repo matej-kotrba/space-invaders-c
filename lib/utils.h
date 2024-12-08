@@ -17,7 +17,7 @@ typedef struct {
     float space_press;
 } Inputs;
 
-Inputs inputs;
+extern Inputs inputs;
 
 void update_input_attrs(Inputs* inputs);
 

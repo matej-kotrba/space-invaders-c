@@ -13,14 +13,13 @@ void set_active_screen(Screen new_screen, GameParams* params) {
     init_screen(new_screen, params);
 }
 
-static void render_screen_buttons(ScreenProperties* sp,
-                                  SDL_Renderer* renderer) {
+void render_screen_buttons(ScreenProperties* sp, SDL_Renderer* renderer) {
     for (int i = 0; i < sp->buttons_len; i++) {
         render_button(&sp->buttons[i], renderer, &sp->cursor, sp->cursors);
     }
 }
 
-static void init_screen(Screen screen, GameParams* params) {
+void init_screen(Screen screen, GameParams* params) {
     switch (screen) {
         case GAMEOVER:
             init_gameover_screen(params);
