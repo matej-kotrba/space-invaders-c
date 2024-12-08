@@ -7,10 +7,10 @@ static Screen active_screen = GAMEOVER;
 
 Screen get_active_screen() { return active_screen; }
 
-void set_active_screen(Screen new_screen, ScreenProperties* sp) {
-    free(sp->buttons);
+void set_active_screen(Screen new_screen, GameParams* params) {
+    free(params->sp->buttons);
     active_screen = new_screen;
-    init_screen(new_screen, sp);
+    init_screen(new_screen, params);
 }
 
 static void render_screen_buttons(ScreenProperties* sp,
@@ -20,10 +20,10 @@ static void render_screen_buttons(ScreenProperties* sp,
     }
 }
 
-static void init_screen(Screen screen, ScreenProperties* sp) {
+static void init_screen(Screen screen, GameParams* params) {
     switch (screen) {
         case GAMEOVER:
-            init_gameover_screen(sp, sp->fonts);
+            init_gameover_screen(params);
             break;
 
         default:
@@ -31,7 +31,9 @@ static void init_screen(Screen screen, ScreenProperties* sp) {
     }
 }
 
-void restart_game_fn(RestartGameParams* params) {
+void restart_game_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
@@ -65,35 +67,39 @@ void restart_game_fn(RestartGameParams* params) {
     params->gp->platforms[1] = create_new_platform(300, 500);
     params->gp->platforms[2] = create_new_platform(500, 500);
 
-    set_active_screen(GAME, params->sp);
+    set_active_screen(GAME, params);
 };
 
-void return_to_menu_fn(ScreenProperties* sp) { set_active_screen(MENU, sp); }
+void return_to_menu_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    set_active_screen(MENU, params);
+}
 
-void init_gameover_screen(ScreenProperties* sp, GameProperties* gp) {
+void init_gameover_screen(GameParams* params) {
     const int buttons_len = 2;
     int window_w, window_h;
-    SDL_GetWindowSize(sp->window, &window_w, &window_h);
+    SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
-    sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
-    sp->buttons_len = buttons_len;
+    params->sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
+    params->sp->buttons_len = buttons_len;
 
     const char* restart = "Restart";
     const char* return_to_menu = "Return to menu";
 
-    Vector2 restart_sizes = get_text_size(sp->fonts->pixeled_small, restart);
+    Vector2 restart_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, restart);
     Vector2 return_to_menu_sizes =
-        get_text_size(sp->fonts->pixeled_small, return_to_menu);
+        get_text_size(params->sp->fonts->pixeled_small, return_to_menu);
 
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
 
-    RestartGameParams rp;
-    sp->buttons[0] = create_new_button(window_w / 2 - restart_sizes.x / 2,
-                                       window_h / 2, sp->fonts->pixeled_small,
-                                       c, restart, restart_game_fn, &rp);
-    sp->buttons[1] = create_new_button(
-        window_w / 2 - return_to_menu_sizes.x / 2, window_h / 2 + 100,
-        sp->fonts->pixeled_small, c, return_to_menu, return_to_menu_fn, sp);
+    params->sp->buttons[0] = create_new_button(
+        window_w / 2 - restart_sizes.x / 2, window_h / 2,
+        params->sp->fonts->pixeled_small, c, restart, restart_game_fn, params);
+    params->sp->buttons[1] =
+        create_new_button(window_w / 2 - return_to_menu_sizes.x / 2,
+                          window_h / 2 + 100, params->sp->fonts->pixeled_small,
+                          c, return_to_menu, return_to_menu_fn, params);
 }
 
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,

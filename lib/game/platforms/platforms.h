@@ -1,6 +1,9 @@
 #pragma once
 
+#include <SDL2/SDL.h>
 #include <stdbool.h>
+
+#include "../projectile/projectile.h"
 
 #define PLATFORMS_COUNT 3
 

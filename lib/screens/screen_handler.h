@@ -2,13 +2,13 @@
 
 #include <SDL2/SDL.h>
 
-#include "game/effects/effects.h"
-#include "game/enemy/enemy.h"
-#include "game/platforms/platforms.h"
-#include "game/player/player.h"
-#include "menu/button.h"
-#include "setup.h"
-#include "utils.h"
+#include "../game/effects/effects.h"
+#include "../game/enemy/enemy.h"
+#include "../game/platforms/platforms.h"
+#include "../game/player/player.h"
+#include "../menu/button.h"
+#include "../setup.h"
+#include "../utils.h"
 
 #define ENEMY_BULLET_ALLOC_COUNT 10
 #define SPREAD_EFFECTS_ALLOC_COUNT 5
@@ -45,14 +45,14 @@ typedef struct {
 typedef struct {
     GameProperties* gp;
     ScreenProperties* sp;
-} RestartGameParams;
+} GameParams;
 
 Screen get_active_screen();
-void set_active_screen(Screen new_screen, ScreenProperties* sp);
+void set_active_screen(Screen new_screen, GameParams* params);
 static void render_screen_buttons(ScreenProperties* sp, SDL_Renderer* renderer);
-static void init_screen(Screen screen, ScreenProperties* sp);
-void restart_game_fn(RestartGameParams* params);
-void return_to_menu_fn(ScreenProperties* sp);
-void init_gameover_screen(ScreenProperties* sp, GameProperties* gp);
+static void init_screen(Screen screen, GameParams* params);
+void restart_game_fn(void* params);
+void return_to_menu_fn(void* params);
+void init_gameover_screen(GameParams* params);
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
                             int score);

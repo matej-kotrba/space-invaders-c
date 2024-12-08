@@ -1,1 +1,5 @@
-cd build && cmake .. && make && ./space_invaders
+cmake -B build
+cd build
+make
+./space-invaders
+cd ..

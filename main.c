@@ -45,8 +45,16 @@ int main(int argc, char* argv[]) {
     Cursors cursors = get_cursors();
 
     ScreenProperties screen_properties;
-    init_screen(get_active_screen(), &screen_properties, &fonts, WINDOW_WIDTH,
-                WINDOW_HEIGHT);
+    screen_properties.window = window;
+    screen_properties.fonts = &fonts;
+    screen_properties.cursors = &cursors;
+
+    GameProperties game_properties;
+    restart_game_fn(&game_properties);
+
+    GameParams game_params = {.gp = &game_properties, .sp = &screen_properties};
+
+    init_screen(get_active_screen(), &game_params);
 
     // Game objects
     int score = 0;
@@ -186,9 +194,7 @@ int main(int argc, char* argv[]) {
                         player_hit(&player);
                         enemy_bullets[i].should_delete = true;
                         if (player.hp <= 0) {
-                            set_active_screen(GAMEOVER, &screen_properties,
-                                              &fonts, WINDOW_WIDTH,
-                                              WINDOW_HEIGHT);
+                            set_active_screen(GAMEOVER, &game_params);
                         }
                         continue;
                     }
@@ -324,9 +330,7 @@ int main(int argc, char* argv[]) {
                 break;
 
             case GAMEOVER:
-                render_gameover_screen(renderer, &screen_properties, &fonts,
-                                       &cursors, score, WINDOW_WIDTH,
-                                       WINDOW_HEIGHT);
+                render_gameover_screen(renderer, &screen_properties, score);
                 break;
             default:
                 break;
