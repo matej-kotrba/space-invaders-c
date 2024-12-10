@@ -153,8 +153,6 @@ int main(int argc, char* argv[]) {
         inputs.mouse_pos.x = mouse_x;
         inputs.mouse_pos.y = mouse_y;
 
-        update_input_attrs(&inputs);
-
         // SDL_SetCursor(cursors.def);
         // SDL_SetCursor(cursors.pointer);
 
@@ -345,6 +343,9 @@ int main(int argc, char* argv[]) {
         // render_button(renderer, fonts.pixeled, 100, 100, c, "New game");
 
         SDL_RenderPresent(renderer);
+
+        // Update input hold times etc.
+        update_input_attrs(&inputs);
     }
 
     // Uvolnění prostředků

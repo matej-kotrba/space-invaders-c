@@ -62,6 +62,10 @@ void handle_button_events(Button* button) {
     SDL_Rect rect = {
         .x = button->x, .y = button->y, .w = sizes.x, .h = sizes.y};
 
+    if (inputs.leftmouse_click == 1) {
+        printf("clicked\n");
+    }
+
     if (inputs.leftmouse_click == 1 &&
         is_point_over_rect(&inputs.mouse_pos, &rect)) {
         button->onClick(button->params);

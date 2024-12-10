@@ -49,6 +49,7 @@ typedef struct {
 
 Screen get_active_screen();
 void set_active_screen(Screen new_screen, GameParams* params);
+void handle_screen_buttons(ScreenProperties* sp);
 void render_screen_buttons(ScreenProperties* sp, SDL_Renderer* renderer);
 void init_screen(Screen screen, GameParams* params);
 void restart_game_fn(void* params);

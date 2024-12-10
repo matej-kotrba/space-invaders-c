@@ -13,6 +13,12 @@ void set_active_screen(Screen new_screen, GameParams* params) {
     init_screen(new_screen, params);
 }
 
+void handle_screen_buttons(ScreenProperties* sp) {
+    for (int i = 0; i < sp->buttons_len; i++) {
+        handle_button_events(&sp->buttons[i]);
+    }
+}
+
 void render_screen_buttons(ScreenProperties* sp, SDL_Renderer* renderer) {
     for (int i = 0; i < sp->buttons_len; i++) {
         render_button(&sp->buttons[i], renderer, &sp->cursor, sp->cursors);
@@ -71,6 +77,7 @@ void restart_game_fn(void* p) {
 
 void return_to_menu_fn(void* p) {
     GameParams* params = (GameParams*)p;
+    printf("Returning to menu\n");
     set_active_screen(MENU, params);
 }
 
@@ -108,6 +115,7 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+    handle_screen_buttons(sp);
     render_screen_buttons(sp, renderer);
 
     const char* gameover = "Game Over!";
