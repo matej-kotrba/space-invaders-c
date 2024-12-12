@@ -9,6 +9,7 @@ Screen get_active_screen() { return active_screen; }
 
 void set_active_screen(Screen new_screen, GameParams* params) {
     free(params->sp->buttons);
+    params->sp->buttons_len = 0;
     active_screen = new_screen;
     init_screen(new_screen, params);
 }
