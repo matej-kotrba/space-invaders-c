@@ -6,7 +6,7 @@
 #include "../../utils.h"
 #include "../projectile/projectile.h"
 
-#define PLAYER_DEFAULT_HP 3
+#define PLAYER_DEFAULT_HP 1
 #define PLAYER_DEFAULT_SPEED 200.0
 
 #define PLAYER_HP_DISPLAY_GAP 10

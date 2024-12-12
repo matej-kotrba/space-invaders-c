@@ -30,7 +30,7 @@ typedef struct {
 typedef struct {
     int score;
     Player player;
-    Enemy enemies;
+    Enemy enemies[ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH];
     int enemies_length;
     bool can_player_shoot;
     int enemy_bullets_length;

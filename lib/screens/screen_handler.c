@@ -8,7 +8,9 @@ static Screen active_screen = GAMEOVER;
 Screen get_active_screen() { return active_screen; }
 
 void set_active_screen(Screen new_screen, GameParams* params) {
-    free(params->sp->buttons);
+    if (params->sp->buttons_len > 0) {
+        free(params->sp->buttons);
+    }
     params->sp->buttons_len = 0;
     active_screen = new_screen;
     init_screen(new_screen, params);
@@ -34,6 +36,40 @@ void init_screen(Screen screen, GameParams* params) {
         case MENU:
             init_menu_screen(params);
             break;
+        case GAME:
+            params->gp->score = 0;
+            int window_w, window_h;
+            SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
+
+            params->gp->player = create_new_player(
+                (float)(window_w / 2 - 25), (float)(window_h - 100), 50, 50);
+
+            params->gp->enemies_length =
+                ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
+            // Enemy enemies[ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH];
+            create_enemy_grid(
+                params->gp->enemies,
+                get_enemy_grid_offset(window_h, ENEMY_GRID_ROW_LENGTH,
+                                      ENEMY_WIDTH, ENEMY_GAP_VALUE),
+                50);
+
+            params->gp->can_player_shoot = true;
+
+            params->gp->enemy_bullets_length = 0;
+            params->gp->enemy_bullets_max = ENEMY_BULLET_ALLOC_COUNT;
+            params->gp->enemy_bullets =
+                (Bullet*)malloc(sizeof(Bullet) * ENEMY_BULLET_ALLOC_COUNT);
+
+            params->gp->spread_effects_length = 0;
+            params->gp->spread_effects_max = SPREAD_EFFECTS_ALLOC_COUNT;
+            params->gp->spread_effects = (SpreadEffect*)malloc(
+                sizeof(SpreadEffect) * SPREAD_EFFECTS_ALLOC_COUNT);
+
+            params->gp->platforms[0] = create_new_platform(100, 500);
+            params->gp->platforms[1] = create_new_platform(300, 500);
+            params->gp->platforms[2] = create_new_platform(500, 500);
+
+            break;
         default:
             break;
     }
@@ -44,6 +80,15 @@ void restart_game_fn(void* p) {
 
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
+
+    for (int i = 0; i < PLATFORMS_COUNT; i++) {
+        free(params->gp->platforms[i].parts);
+    }
+    free(params->gp->enemy_bullets);
+    for (int i = 0; i < params->gp->spread_effects_length; i++) {
+        free(params->gp->spread_effects[i].particles);
+    }
+    free(params->gp->spread_effects);
 
     params->gp->score = 0;
 
