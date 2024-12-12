@@ -330,6 +330,9 @@ int main(int argc, char* argv[]) {
             case GAMEOVER:
                 render_gameover_screen(renderer, &screen_properties, score);
                 break;
+            case MENU:
+                render_menu_screen(renderer, &screen_properties);
+                break;
             default:
                 break;
         }

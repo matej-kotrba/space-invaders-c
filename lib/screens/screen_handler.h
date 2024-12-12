@@ -57,3 +57,7 @@ void return_to_menu_fn(void* params);
 void init_gameover_screen(GameParams* params);
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
                             int score);
+void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp);
+void play_game_fn(void* p);
+void options_fn(void* p);
+void init_menu_screen(GameParams* params);

@@ -30,7 +30,9 @@ void init_screen(Screen screen, GameParams* params) {
         case GAMEOVER:
             init_gameover_screen(params);
             break;
-
+        case MENU:
+            init_menu_screen(params);
+            break;
         default:
             break;
     }
@@ -108,6 +110,41 @@ void init_gameover_screen(GameParams* params) {
                           c, return_to_menu, return_to_menu_fn, params);
 }
 
+void play_game_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    restart_game_fn(params);
+}
+
+void options_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    printf("Options\n");
+}
+
+void init_menu_screen(GameParams* params) {
+    const int buttons_len = 2;
+    int window_w, window_h;
+    SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
+
+    params->sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
+    params->sp->buttons_len = buttons_len;
+
+    const char* play = "Play";
+    const char* options = "Options";
+
+    Vector2 play_sizes = get_text_size(params->sp->fonts->pixeled_small, play);
+    Vector2 options_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, options);
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+
+    params->sp->buttons[0] = create_new_button(
+        window_w / 2 - play_sizes.x / 2, window_h / 2,
+        params->sp->fonts->pixeled_small, c, play, play_game_fn, params);
+    params->sp->buttons[1] = create_new_button(
+        window_w / 2 - options_sizes.x / 2, window_h / 2 + 100,
+        params->sp->fonts->pixeled_small, c, options, options_fn, params);
+}
+
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
                             int score) {
     int window_w, window_h;
@@ -126,4 +163,14 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
     render_text(renderer, sp->fonts->pixeled,
                 window_w / 2 - gameover_sizes.x / 2,
                 window_h / 2 - gameover_sizes.y / 2 - 100, c, gameover);
+}
+
+void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
+    int window_w, window_h;
+    SDL_GetWindowSize(sp->window, &window_w, &window_h);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    handle_screen_buttons(sp);
+    render_screen_buttons(sp, renderer);
 }
