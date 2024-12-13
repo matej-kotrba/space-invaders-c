@@ -65,9 +65,16 @@ void init_screen(Screen screen, GameParams* params) {
             params->gp->spread_effects = (SpreadEffect*)malloc(
                 sizeof(SpreadEffect) * SPREAD_EFFECTS_ALLOC_COUNT);
 
-            params->gp->platforms[0] = create_new_platform(100, 500);
-            params->gp->platforms[1] = create_new_platform(300, 500);
-            params->gp->platforms[2] = create_new_platform(500, 500);
+            const int platform_width =
+                PLATFORM_PART_SIZE * PLATFORM_TEMPLATE_COLUMNS;
+
+            for (int i = 0; i < PLATFORMS_COUNT; i++) {
+                params->gp->platforms[i] = create_new_platform(
+                    (window_w / PLATFORMS_COUNT) * i + platform_width, 500);
+            }
+
+            // params->gp->platforms[1] = create_new_platform(300, 500);
+            // params->gp->platforms[2] = create_new_platform(500, 500);
 
             break;
         default:

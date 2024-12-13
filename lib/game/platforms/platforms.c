@@ -9,12 +9,6 @@
 #include "../../utils.h"
 #include "../projectile/projectile.h"
 
-#define PLATFORM_TEMPLATE_ROWS 18
-#define PLATFORM_TEMPLATE_COLUMNS 20
-#define PLATFORM_PART_SIZE 4
-#define PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD 2
-#define PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD 4
-
 static int platform_template[PLATFORM_TEMPLATE_ROWS *
                              (PLATFORM_TEMPLATE_COLUMNS / 2)] = {
     0, 0, 0, 0, 0, 1, 1, 1, 1, 1,  //
