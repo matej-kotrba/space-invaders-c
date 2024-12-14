@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = GAMEOVER;
+static Screen active_screen = MENU;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -167,13 +167,18 @@ void play_game_fn(void* p) {
     restart_game_fn(params);
 }
 
+void scoreboard_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    set_active_screen(SCOREBOARD, params);
+}
+
 void options_fn(void* p) {
     GameParams* params = (GameParams*)p;
     printf("Options\n");
 }
 
 void init_menu_screen(GameParams* params) {
-    const int buttons_len = 2;
+    const int buttons_len = 3;
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
@@ -181,9 +186,12 @@ void init_menu_screen(GameParams* params) {
     params->sp->buttons_len = buttons_len;
 
     const char* play = "Play";
+    const char* scoreboard = "Scoreboard";
     const char* options = "Options";
 
     Vector2 play_sizes = get_text_size(params->sp->fonts->pixeled_small, play);
+    Vector2 scoreboard_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, scoreboard);
     Vector2 options_sizes =
         get_text_size(params->sp->fonts->pixeled_small, options);
 
@@ -193,12 +201,15 @@ void init_menu_screen(GameParams* params) {
         window_w / 2 - play_sizes.x / 2, window_h / 2,
         params->sp->fonts->pixeled_small, c, play, play_game_fn, params);
     params->sp->buttons[1] = create_new_button(
-        window_w / 2 - options_sizes.x / 2, window_h / 2 + 100,
+        window_w / 2 - scoreboard_sizes.x / 2, window_h / 2 + 100,
+        params->sp->fonts->pixeled_small, c, scoreboard, scoreboard_fn, params);
+    params->sp->buttons[2] = create_new_button(
+        window_w / 2 - options_sizes.x / 2, window_h / 2 + 200,
         params->sp->fonts->pixeled_small, c, options, options_fn, params);
 }
 
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
-                            int score) {
+                            int score, int seconds) {
     int window_w, window_h;
     SDL_GetWindowSize(sp->window, &window_w, &window_h);
 
@@ -208,6 +219,11 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
     render_screen_buttons(sp, renderer);
 
     const char* gameover = "Game Over!";
+    char score_text[20];
+    sprintf(score_text, "Score: %d", score);
+    char time_text[20];
+    sprintf(time_text, "Time: %0.2d:%0.2d.%0.2d", ((int)seconds / 60) % 60,
+            (int)seconds % 60, (int)(seconds * 100) % 100);
 
     Vector2 gameover_sizes = get_text_size(sp->fonts->pixeled, gameover);
 
@@ -215,6 +231,18 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
     render_text(renderer, sp->fonts->pixeled,
                 window_w / 2 - gameover_sizes.x / 2,
                 window_h / 2 - gameover_sizes.y / 2 - 100, c, gameover);
+    render_text(renderer, sp->fonts->pixeled_small, 40, 20, c, score_text);
+    render_text(renderer, sp->fonts->pixeled_small, 40, 80, c, time_text);
+}
+
+void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
+    int window_w, window_h;
+    SDL_GetWindowSize(sp->window, &window_w, &window_h);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    handle_screen_buttons(sp);
+    render_screen_buttons(sp, renderer);
 }
 
 void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {

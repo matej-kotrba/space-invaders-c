@@ -15,7 +15,7 @@
 
 #define ENEMY_SCORE 10
 
-typedef enum { MENU, GAME, GAMEOVER } Screen;
+typedef enum { MENU, GAME, GAMEOVER, SCOREBOARD } Screen;
 
 typedef struct {
     SDL_Window* window;
@@ -29,6 +29,7 @@ typedef struct {
 
 typedef struct {
     int score;
+    float seconds;
     Player player;
     Enemy enemies[ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH];
     int enemies_length;
@@ -56,7 +57,8 @@ void restart_game_fn(void* params);
 void return_to_menu_fn(void* params);
 void init_gameover_screen(GameParams* params);
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
-                            int score);
+                            int score, int seconds);
+void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void play_game_fn(void* p);
 void options_fn(void* p);

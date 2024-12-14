@@ -50,42 +50,10 @@ int main(int argc, char* argv[]) {
     screen_properties.cursors = &cursors;
 
     GameProperties gp;
-    // restart_game_fn(&gp);
 
     GameParams game_params = {.gp = &gp, .sp = &screen_properties};
 
     init_screen(get_active_screen(), &game_params);
-
-    // Game objects
-    // int score = 0;
-
-    // Player player = create_new_player((float)(WINDOW_WIDTH / 2 - 25),
-    //                                   (float)(WINDOW_HEIGHT - 100), 50, 50);
-
-    // int enemies_length = ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
-    // Enemy enemies[ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH];
-    // create_enemy_grid(enemies,
-    //                   get_enemy_grid_offset(WINDOW_WIDTH,
-    //                   ENEMY_GRID_ROW_LENGTH,
-    //                                         ENEMY_WIDTH, ENEMY_GAP_VALUE),
-    //                   50);
-
-    // bool can_player_shoot = true;
-
-    // int enemy_bullets_length = 0;
-    // int enemy_bullets_max = ENEMY_BULLET_ALLOC_COUNT;
-    // Bullet* enemy_bullets;
-    // enemy_bullets = (Bullet*)malloc(sizeof(Bullet) *
-    // ENEMY_BULLET_ALLOC_COUNT);
-
-    // int spread_effects_length = 0;
-    // int spread_effects_max = SPREAD_EFFECTS_ALLOC_COUNT;
-    // SpreadEffect* spread_effects = (SpreadEffect*)malloc(
-    //     sizeof(SpreadEffect) * SPREAD_EFFECTS_ALLOC_COUNT);
-
-    // Platform platforms[PLATFORMS_COUNT] = {create_new_platform(100, 500),
-    //                                        create_new_platform(300, 500),
-    //                                        create_new_platform(500, 500)};
 
     SDL_Event event;
     bool running = true;
@@ -163,6 +131,7 @@ int main(int argc, char* argv[]) {
         switch (get_active_screen()) {
             case GAME:
                 // Game update cycle
+                gp.seconds += delta_time;
                 update_player(&gp.player, WINDOW_WIDTH, delta_time);
                 try_shoot_player_projectile(&gp.player);
 
@@ -196,6 +165,14 @@ int main(int argc, char* argv[]) {
                         gp.enemy_bullets[i].should_delete = true;
                         if (gp.player.hp <= 0) {
                             set_active_screen(GAMEOVER, &game_params);
+                            FILE* score_file = fopen("scoreboard.txt", "a");
+                            if (score_file == NULL) {
+                                printf("Error opening file!\n");
+                            } else {
+                                fprintf(score_file, "%d;%f\n", gp.score,
+                                        gp.seconds);
+                                fclose(score_file);
+                            }
                         }
                         continue;
                     }
@@ -334,10 +311,14 @@ int main(int argc, char* argv[]) {
                 break;
 
             case GAMEOVER:
-                render_gameover_screen(renderer, &screen_properties, gp.score);
+                render_gameover_screen(renderer, &screen_properties, gp.score,
+                                       gp.seconds);
                 break;
             case MENU:
                 render_menu_screen(renderer, &screen_properties);
+                break;
+            case SCOREBOARD:
+                render_scoreboard_screen(renderer, &screen_properties);
                 break;
             default:
                 break;
