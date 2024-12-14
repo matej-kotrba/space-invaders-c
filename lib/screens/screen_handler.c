@@ -70,11 +70,10 @@ void init_screen(Screen screen, GameParams* params) {
 
             for (int i = 0; i < PLATFORMS_COUNT; i++) {
                 params->gp->platforms[i] = create_new_platform(
-                    (window_w / PLATFORMS_COUNT) * i + platform_width, 500);
+                    (window_w / PLATFORMS_COUNT) * i +
+                        (window_w / PLATFORMS_COUNT / 2) - platform_width / 2,
+                    500);
             }
-
-            // params->gp->platforms[1] = create_new_platform(300, 500);
-            // params->gp->platforms[2] = create_new_platform(500, 500);
 
             break;
         default:
