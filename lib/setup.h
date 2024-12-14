@@ -13,6 +13,12 @@ typedef struct {
     SDL_Cursor* pointer;
 } Cursors;
 
+typedef struct {
+    SDL_Texture* title;
+} Images;
+
 Fonts get_fonts();
 
 Cursors get_cursors();
+
+Images get_images(SDL_Renderer* renderer);

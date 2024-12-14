@@ -253,4 +253,9 @@ void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     SDL_RenderClear(renderer);
     handle_screen_buttons(sp);
     render_screen_buttons(sp, renderer);
+
+    SDL_Rect rect = {.x = window_w / 2 - 250, .y = 50, .w = 500, .h = 200};
+
+    SDL_RenderCopyEx(renderer, sp->images->title, NULL, &rect, 0, NULL,
+                     SDL_FLIP_NONE);
 }

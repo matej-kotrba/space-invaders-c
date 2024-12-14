@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <time.h>
@@ -36,6 +37,11 @@ int main(int argc, char* argv[]) {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
+    if (IMG_Init(IMG_INIT_PNG) == 0) {
+        printf("IMG_INIT error\n");
+        return 1;
+    };
+
     // Setup
     srand(time(NULL));
     Uint32 previous_time = SDL_GetTicks();
@@ -43,11 +49,13 @@ int main(int argc, char* argv[]) {
 
     Fonts fonts = get_fonts();
     Cursors cursors = get_cursors();
+    Images images = get_images(renderer);
 
     ScreenProperties screen_properties;
     screen_properties.window = window;
     screen_properties.fonts = &fonts;
     screen_properties.cursors = &cursors;
+    screen_properties.images = &images;
 
     GameProperties gp;
 
@@ -272,7 +280,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
 
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_SetRenderDrawColor(renderer, 21, 10, 27, 255);
                 SDL_RenderClear(renderer);
 
                 // Render effects

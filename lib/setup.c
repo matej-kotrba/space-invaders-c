@@ -1,5 +1,7 @@
 #include "setup.h"
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
 Fonts get_fonts() {
@@ -18,4 +20,11 @@ Cursors get_cursors() {
         .pointer = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND)};
 
     return cursors;
+}
+
+Images get_images(SDL_Renderer* renderer) {
+    Images images = {.title = IMG_LoadTexture(
+                         renderer, "../static/imgs/space-invaders.png")};
+
+    return images;
 }

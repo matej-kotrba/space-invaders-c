@@ -21,6 +21,7 @@ typedef struct {
     SDL_Window* window;
     Fonts* fonts;
     Cursors* cursors;
+    Images* images;
     Button* buttons;
     int buttons_len;
 
