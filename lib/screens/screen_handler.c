@@ -42,7 +42,8 @@ void init_screen(Screen screen, GameParams* params) {
             SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
             params->gp->player = create_new_player(
-                (float)(window_w / 2 - 25), (float)(window_h - 100), 50, 50);
+                (float)(window_w / 2 - 25), (float)(window_h - 100),
+                PLAYER_WIDTH, PLAYER_HEIGHT, params->sp->images->player_ship);
 
             params->gp->enemies_length =
                 ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
@@ -98,8 +99,9 @@ void restart_game_fn(void* p) {
 
     params->gp->score = 0;
 
-    params->gp->player = create_new_player((float)(window_w / 2 - 25),
-                                           (float)(window_h - 100), 50, 50);
+    params->gp->player = create_new_player(
+        (float)(window_w / 2 - 25), (float)(window_h - 100), PLAYER_WIDTH,
+        PLAYER_HEIGHT, params->sp->images->player_ship);
 
     params->gp->enemies_length =
         ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;

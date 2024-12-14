@@ -6,12 +6,7 @@
 #include "../../utils.h"
 #include "../projectile/projectile.h"
 
-#define PLAYER_DEFAULT_HP 1
-#define PLAYER_DEFAULT_SPEED 200.0
-
-#define PLAYER_HP_DISPLAY_GAP 10
-
-Player create_new_player(float x, float y, int w, int h) {
+Player create_new_player(float x, float y, int w, int h, SDL_Texture* texture) {
     Player new_player = {
         .x = x,
         .y = y,
@@ -21,18 +16,19 @@ Player create_new_player(float x, float y, int w, int h) {
         .max_hp = PLAYER_DEFAULT_HP,
         .s = PLAYER_DEFAULT_SPEED,
         .can_shoot = true,
-        .projectile = create_new_bullet(-100, -100, 1, 1, -1, -1)};
+        .projectile = create_new_bullet(-100, -100, 1, 1, -1, -1),
+        .texture = texture};
 
     return new_player;
 }
 
 void render_player(Player* player, SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
     SDL_Rect rect = {
         .x = player->x, .y = player->y, .w = player->w, .h = player->h};
 
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderCopyEx(renderer, player->texture, NULL, &rect, 0, NULL,
+                     SDL_FLIP_NONE);
+    // SDL_RenderFillRect(renderer, &rect);
 }
 
 void update_player(Player* player, int screen_width, float delta_time) {

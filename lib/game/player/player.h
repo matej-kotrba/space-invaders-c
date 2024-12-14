@@ -1,9 +1,17 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 
 #include "../projectile/projectile.h"
+
+#define PLAYER_WIDTH 80
+#define PLAYER_HEIGHT 50
+#define PLAYER_DEFAULT_HP 1
+#define PLAYER_DEFAULT_SPEED 200.0
+
+#define PLAYER_HP_DISPLAY_GAP 10
 
 typedef struct {
     float x;
@@ -15,9 +23,10 @@ typedef struct {
     float s;
     bool can_shoot;
     Bullet projectile;
+    SDL_Texture* texture;
 } Player;
 
-Player create_new_player(float x, float y, int w, int h);
+Player create_new_player(float x, float y, int w, int h, SDL_Texture* texture);
 
 void render_player(Player*, SDL_Renderer*);
 void update_player(Player* player, int screen_width, float delta_time);

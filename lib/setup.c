@@ -23,8 +23,9 @@ Cursors get_cursors() {
 }
 
 Images get_images(SDL_Renderer* renderer) {
-    Images images = {.title = IMG_LoadTexture(
-                         renderer, "../static/imgs/space-invaders.png")};
+    Images images = {
+        .title = IMG_LoadTexture(renderer, "../static/imgs/space-invaders.png"),
+        .player_ship = IMG_LoadTexture(renderer, "../static/imgs/ship.png")};
 
     return images;
 }
