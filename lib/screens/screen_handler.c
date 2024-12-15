@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = MENU;
+static Screen active_screen = SCOREBOARD;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -35,6 +35,9 @@ void init_screen(Screen screen, GameParams* params) {
             break;
         case MENU:
             init_menu_screen(params);
+            break;
+        case SCOREBOARD:
+            init_scoreboard_screen(params);
             break;
         case GAME:
             params->gp->score = 0;
@@ -164,6 +167,60 @@ void init_gameover_screen(GameParams* params) {
                           c, return_to_menu, return_to_menu_fn, params);
 }
 
+void back_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    set_active_screen(MENU, params);
+}
+
+void init_scoreboard_screen(GameParams* params) {
+    const int buttons_len = 1;
+    int window_w, window_h;
+    SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
+
+    params->sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
+    params->sp->buttons_len = buttons_len;
+
+    const char* back = "<--";
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+
+    params->sp->buttons[0] = create_new_button(
+        20, 20, params->sp->fonts->pixeled_small, c, back, back_fn, params);
+
+    FILE* scoreboard = fopen("scoreboard.txt", "r");
+    if (scoreboard == NULL) {
+        return;
+    }
+
+    char buffer[100];
+    int n = 0;
+    while (fgets(buffer, 100, scoreboard) != NULL) {
+        params->sp->scoreboard_records = realloc(
+            params->sp->scoreboard_records, sizeof(ScoreboardRecord) * (++n));
+        char* ptr = strtok(buffer, ";");
+        int i = 0;
+
+        while (ptr != NULL) {
+            switch (i) {
+                case 0:
+                    params->sp->scoreboard_records[n - 1].score = atoi(ptr);
+                    break;
+                case 1:
+                    params->sp->scoreboard_records[n - 1].seconds = atof(ptr);
+                    break;
+            }
+            i++;
+            ptr = strtok(NULL, ";");
+        }
+
+        printf("%d\n", params->sp->scoreboard_records[n - 1].score);
+    }
+
+    params->sp->scoreboard_records_len = n;
+
+    fclose(scoreboard);
+}
+
 void play_game_fn(void* p) {
     GameParams* params = (GameParams*)p;
     restart_game_fn(params);
@@ -248,6 +305,24 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     SDL_RenderClear(renderer);
     handle_screen_buttons(sp);
     render_screen_buttons(sp, renderer);
+
+    for (int i = 0; i < sp->scoreboard_records_len; i++) {
+        char buffer[20];
+        sprintf(buffer, "%d - %.2f", sp->scoreboard_records[i].score,
+                sp->scoreboard_records[i].seconds);
+        render_text(renderer, sp->fonts->pixeled_small, 20, 60 + i * 40,
+                    (SDL_Color){255, 255, 255, 255}, buffer);
+    }
+
+    if (sp->scoreboard_records == NULL) {
+        char* no_records = "No records yet!";
+        Vector2 no_records_sizes =
+            get_text_size(sp->fonts->pixeled, no_records);
+        SDL_Color c = {255, 255, 255, 255};
+        render_text(renderer, sp->fonts->pixeled,
+                    window_w / 2 - no_records_sizes.x / 2,
+                    window_h / 2 - no_records_sizes.y / 2, c, no_records);
+    }
 }
 
 void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {

@@ -56,6 +56,8 @@ int main(int argc, char* argv[]) {
     screen_properties.fonts = &fonts;
     screen_properties.cursors = &cursors;
     screen_properties.images = &images;
+    screen_properties.scoreboard_records = NULL;
+    screen_properties.scoreboard_records_len = 0;
 
     GameProperties gp;
 

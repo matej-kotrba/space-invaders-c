@@ -18,6 +18,11 @@
 typedef enum { MENU, GAME, GAMEOVER, SCOREBOARD } Screen;
 
 typedef struct {
+    int score;
+    float seconds;
+} ScoreboardRecord;
+
+typedef struct {
     SDL_Window* window;
     Fonts* fonts;
     Cursors* cursors;
@@ -26,6 +31,9 @@ typedef struct {
     int buttons_len;
 
     SDL_Cursor* cursor;
+
+    ScoreboardRecord* scoreboard_records;
+    int scoreboard_records_len;
 } ScreenProperties;
 
 typedef struct {
@@ -64,3 +72,5 @@ void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void play_game_fn(void* p);
 void options_fn(void* p);
 void init_menu_screen(GameParams* params);
+void back_fn(void* p);
+void init_scoreboard_screen(GameParams* params);
