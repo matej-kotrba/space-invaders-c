@@ -211,7 +211,7 @@ void init_menu_screen(GameParams* params) {
 }
 
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
-                            int score, int seconds) {
+                            int score, float seconds) {
     int window_w, window_h;
     SDL_GetWindowSize(sp->window, &window_w, &window_h);
 
@@ -224,8 +224,11 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
     char score_text[20];
     sprintf(score_text, "Score: %d", score);
     char time_text[20];
-    sprintf(time_text, "Time: %0.2d:%0.2d.%0.2d", ((int)seconds / 60) % 60,
-            (int)seconds % 60, (int)(seconds * 100) % 100);
+
+    int minutes = (int)(seconds / 60);
+    int secs = (int)(seconds - (minutes * 60));
+    int milisecs = (int)((seconds - (minutes * 60) - secs) * 1000);
+    sprintf(time_text, "Time: %02d:%02d.%03d", minutes, secs, milisecs);
 
     Vector2 gameover_sizes = get_text_size(sp->fonts->pixeled, gameover);
 
