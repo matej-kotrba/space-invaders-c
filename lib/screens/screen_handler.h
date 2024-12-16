@@ -34,6 +34,7 @@ typedef struct {
 
     ScoreboardRecord* scoreboard_records;
     int scoreboard_records_len;
+    int current_page;
 } ScreenProperties;
 
 typedef struct {
@@ -74,3 +75,5 @@ void options_fn(void* p);
 void init_menu_screen(GameParams* params);
 void back_fn(void* p);
 void init_scoreboard_screen(GameParams* params);
+void increment_page(void* p);
+void decrement_page(void* p);

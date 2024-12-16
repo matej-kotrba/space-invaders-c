@@ -172,20 +172,40 @@ void back_fn(void* p) {
     set_active_screen(MENU, params);
 }
 
+void increment_page(void* p) {
+    GameParams* params = (GameParams*)p;
+    printf("Incrementing page\n");
+    params->sp->current_page++;
+}
+
+void decrement_page(void* p) {
+    GameParams* params = (GameParams*)p;
+    params->sp->current_page--;
+}
+
 void init_scoreboard_screen(GameParams* params) {
-    const int buttons_len = 1;
+    const int buttons_len = 3;
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
     params->sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
     params->sp->buttons_len = buttons_len;
+    params->sp->current_page = 0;
 
     const char* back = "<--";
+    const char* page_f = ">";
+    const char* page_b = "<";
 
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
 
     params->sp->buttons[0] = create_new_button(
         20, 20, params->sp->fonts->pixeled_small, c, back, back_fn, params);
+    params->sp->buttons[1] = create_new_button(
+        window_w / 2 - 80, window_h - 80, params->sp->fonts->pixeled_small, c,
+        page_b, decrement_page, params);
+    params->sp->buttons[2] = create_new_button(
+        window_w / 2 + 60, window_h - 80, params->sp->fonts->pixeled_small, c,
+        page_f, increment_page, params);
 
     FILE* scoreboard = fopen("scoreboard.txt", "r");
     if (scoreboard == NULL) {
@@ -213,6 +233,23 @@ void init_scoreboard_screen(GameParams* params) {
             ptr = strtok(NULL, ";");
         }
     }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n - 1 - i; j++) {
+            if (params->sp->scoreboard_records[j].score <
+                    params->sp->scoreboard_records[j + 1].score ||
+                params->sp->scoreboard_records[j].score ==
+                        params->sp->scoreboard_records[j + 1].score &&
+                    params->sp->scoreboard_records[j].seconds >
+                        params->sp->scoreboard_records[j + 1].seconds) {
+                ScoreboardRecord temp = params->sp->scoreboard_records[j];
+                params->sp->scoreboard_records[j] =
+                    params->sp->scoreboard_records[j + 1];
+                params->sp->scoreboard_records[j + 1] = temp;
+            }
+        }
+    }
+    printf("n: %d\n", n);
 
     params->sp->scoreboard_records_len = n;
 
@@ -304,7 +341,15 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     handle_screen_buttons(sp);
     render_screen_buttons(sp, renderer);
 
-    for (int i = 0; i < sp->scoreboard_records_len; i++) {
+    const int row_height = 50;
+
+    const int cols_per_page = 2;
+    const int rows_per_page = (window_h - 160) / row_height;
+
+    for (int i = sp->current_page * rows_per_page;
+         i < sp->scoreboard_records_len &&
+         (sp->current_page + 1) * rows_per_page * cols_per_page;
+         i++) {
         char buffer[30];
 
         int minutes = (int)(sp->scoreboard_records[i].seconds / 60);
@@ -312,10 +357,15 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
         int milisecs =
             (int)((sp->scoreboard_records[i].seconds - (minutes * 60) - secs) *
                   1000);
-        sprintf(buffer, "Score: %03d in %02d:%02d.%02d",
+        sprintf(buffer, "%03d (%02d:%02d.%02d)",
                 sp->scoreboard_records[i].score, minutes, secs, milisecs);
-        render_text(renderer, sp->fonts->pixeled_small, 20, 60 + i * 40,
-                    (SDL_Color){255, 255, 255, 255}, buffer);
+        render_text(
+            renderer, sp->fonts->pixeled_small,
+            20 + ((i - sp->current_page * rows_per_page * cols_per_page) /
+                  rows_per_page) *
+                     window_w / cols_per_page,
+            80 + (i % rows_per_page) * row_height,
+            (SDL_Color){255, 255, 255, 255}, buffer);
     }
 
     if (sp->scoreboard_records == NULL) {
@@ -327,6 +377,14 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
                     window_w / 2 - no_records_sizes.x / 2,
                     window_h / 2 - no_records_sizes.y / 2, c, no_records);
     }
+
+    char pages[10];
+    sprintf(pages, "%d/%d", sp->current_page + 1,
+            sp->scoreboard_records_len / (rows_per_page * cols_per_page) + 1);
+    Vector2 pages_sizes = get_text_size(sp->fonts->pixeled_small, pages);
+    SDL_Color c = {255, 255, 255, 255};
+    render_text(renderer, sp->fonts->pixeled_small,
+                window_w / 2 - pages_sizes.x / 2, window_h - 80, c, pages);
 }
 
 void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
