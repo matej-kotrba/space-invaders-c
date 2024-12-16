@@ -212,8 +212,6 @@ void init_scoreboard_screen(GameParams* params) {
             i++;
             ptr = strtok(NULL, ";");
         }
-
-        printf("%d\n", params->sp->scoreboard_records[n - 1].score);
     }
 
     params->sp->scoreboard_records_len = n;
@@ -307,9 +305,15 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     render_screen_buttons(sp, renderer);
 
     for (int i = 0; i < sp->scoreboard_records_len; i++) {
-        char buffer[20];
-        sprintf(buffer, "%d - %.2f", sp->scoreboard_records[i].score,
-                sp->scoreboard_records[i].seconds);
+        char buffer[30];
+
+        int minutes = (int)(sp->scoreboard_records[i].seconds / 60);
+        int secs = (int)(sp->scoreboard_records[i].seconds - (minutes * 60));
+        int milisecs =
+            (int)((sp->scoreboard_records[i].seconds - (minutes * 60) - secs) *
+                  1000);
+        sprintf(buffer, "Score: %03d in %02d:%02d.%02d",
+                sp->scoreboard_records[i].score, minutes, secs, milisecs);
         render_text(renderer, sp->fonts->pixeled_small, 20, 60 + i * 40,
                     (SDL_Color){255, 255, 255, 255}, buffer);
     }
