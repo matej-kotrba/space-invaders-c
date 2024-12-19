@@ -15,7 +15,9 @@
 
 #define ENEMY_SCORE 10
 
-typedef enum { MENU, GAME, GAMEOVER, SCOREBOARD } Screen;
+#define SCOREBOARD_RECORDS_ROW_LENGTH
+
+typedef enum { MENU, GAME, GAMEOVER, SCOREBOARD, OPTIONS } Screen;
 
 typedef struct {
     int score;
@@ -36,6 +38,7 @@ typedef struct {
     ScoreboardRecord* scoreboard_records;
     int scoreboard_records_len;
     int current_page;
+    int max_pages;
 } ScreenProperties;
 
 typedef struct {
@@ -71,10 +74,12 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
                             int score, float seconds);
 void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp);
+void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void play_game_fn(void* p);
 void options_fn(void* p);
 void init_menu_screen(GameParams* params);
 void back_fn(void* p);
 void init_scoreboard_screen(GameParams* params);
+void init_options_screen(GameParams* params);
 void increment_page(void* p);
 void decrement_page(void* p);

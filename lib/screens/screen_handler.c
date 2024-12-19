@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = GAME;
+static Screen active_screen = OPTIONS;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -38,6 +38,9 @@ void init_screen(Screen screen, GameParams* params) {
             break;
         case SCOREBOARD:
             init_scoreboard_screen(params);
+            break;
+        case OPTIONS:
+            init_options_screen(params);
             break;
         case GAME:
             params->gp->score = 0;
@@ -177,13 +180,13 @@ void back_fn(void* p) {
 
 void increment_page(void* p) {
     GameParams* params = (GameParams*)p;
-    printf("Incrementing page\n");
-    params->sp->current_page++;
+    if (params->sp->current_page < params->sp->max_pages)
+        params->sp->current_page++;
 }
 
 void decrement_page(void* p) {
     GameParams* params = (GameParams*)p;
-    params->sp->current_page--;
+    if (params->sp->current_page > 0) params->sp->current_page--;
 }
 
 void init_scoreboard_screen(GameParams* params) {
@@ -252,11 +255,28 @@ void init_scoreboard_screen(GameParams* params) {
             }
         }
     }
-    printf("n: %d\n", n);
 
     params->sp->scoreboard_records_len = n;
 
     fclose(scoreboard);
+}
+
+void init_options_screen(GameParams* params) {
+    const int buttons_len = 1;
+    int window_w, window_h;
+    SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
+
+    params->sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
+    params->sp->buttons_len = buttons_len;
+
+    const char* back = "<--";
+
+    Vector2 back_sizes = get_text_size(params->sp->fonts->pixeled_small, back);
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+
+    params->sp->buttons[0] = create_new_button(
+        20, 20, params->sp->fonts->pixeled_small, c, back, back_fn, params);
 }
 
 void play_game_fn(void* p) {
@@ -271,7 +291,7 @@ void scoreboard_fn(void* p) {
 
 void options_fn(void* p) {
     GameParams* params = (GameParams*)p;
-    printf("Options\n");
+    set_active_screen(OPTIONS, params);
 }
 
 void init_menu_screen(GameParams* params) {
@@ -349,6 +369,9 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     const int cols_per_page = 2;
     const int rows_per_page = (window_h - 160) / row_height;
 
+    sp->max_pages =
+        sp->scoreboard_records_len / (rows_per_page * cols_per_page);
+
     for (int i = sp->current_page * rows_per_page;
          i < sp->scoreboard_records_len &&
          (sp->current_page + 1) * rows_per_page * cols_per_page;
@@ -403,4 +426,21 @@ void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
 
     SDL_RenderCopyEx(renderer, sp->images->title, NULL, &rect, 0, NULL,
                      SDL_FLIP_NONE);
+}
+
+void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
+    int window_w, window_h;
+    SDL_GetWindowSize(sp->window, &window_w, &window_h);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    handle_screen_buttons(sp);
+    render_screen_buttons(sp, renderer);
+
+    const char* options = "Options";
+    Vector2 options_sizes = get_text_size(sp->fonts->pixeled, options);
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+    render_text(renderer, sp->fonts->pixeled,
+                window_w / 2 - options_sizes.x / 2, 20, c, options);
 }

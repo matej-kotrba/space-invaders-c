@@ -332,6 +332,9 @@ int main(int argc, char* argv[]) {
             case SCOREBOARD:
                 render_scoreboard_screen(renderer, &screen_properties);
                 break;
+            case OPTIONS:
+                render_options_screen(renderer, &screen_properties);
+                break;
             default:
                 break;
         }
