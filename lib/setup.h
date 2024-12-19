@@ -18,8 +18,13 @@ typedef struct {
     SDL_Texture* player_ship;
 } Images;
 
+typedef struct {
+    SDL_Texture* image;
+    int length;
+    int width;
+} Sprite;
+
 Fonts get_fonts();
-
 Cursors get_cursors();
-
 Images get_images(SDL_Renderer* renderer);
+Sprite* get_invader_sprites(SDL_Renderer* renderer);

@@ -27,6 +27,7 @@ typedef struct {
     Fonts* fonts;
     Cursors* cursors;
     Images* images;
+    Sprite* invader_sprites;
     Button* buttons;
     int buttons_len;
 

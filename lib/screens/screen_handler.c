@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = SCOREBOARD;
+static Screen active_screen = GAME;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -55,7 +55,7 @@ void init_screen(Screen screen, GameParams* params) {
                 params->gp->enemies,
                 get_enemy_grid_offset(window_h, ENEMY_GRID_ROW_LENGTH,
                                       ENEMY_WIDTH, ENEMY_GAP_VALUE),
-                50);
+                50, params->sp->invader_sprites);
 
             params->gp->can_player_shoot = true;
 
@@ -108,17 +108,15 @@ void restart_game_fn(void* p) {
 
     params->gp->enemies_length =
         ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
-    Enemy enemies[ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH];
-    create_enemy_grid(enemies,
-                      get_enemy_grid_offset(window_w, ENEMY_GRID_ROW_LENGTH,
+    create_enemy_grid(params->gp->enemies,
+                      get_enemy_grid_offset(window_h, ENEMY_GRID_ROW_LENGTH,
                                             ENEMY_WIDTH, ENEMY_GAP_VALUE),
-                      50);
+                      50, params->sp->invader_sprites);
 
     params->gp->can_player_shoot = true;
 
     params->gp->enemy_bullets_length = 0;
     params->gp->enemy_bullets_max = ENEMY_BULLET_ALLOC_COUNT;
-
     params->gp->enemy_bullets =
         (Bullet*)malloc(sizeof(Bullet) * ENEMY_BULLET_ALLOC_COUNT);
 
@@ -127,9 +125,14 @@ void restart_game_fn(void* p) {
     params->gp->spread_effects = (SpreadEffect*)malloc(
         sizeof(SpreadEffect) * SPREAD_EFFECTS_ALLOC_COUNT);
 
-    params->gp->platforms[0] = create_new_platform(100, 500);
-    params->gp->platforms[1] = create_new_platform(300, 500);
-    params->gp->platforms[2] = create_new_platform(500, 500);
+    const int platform_width = PLATFORM_PART_SIZE * PLATFORM_TEMPLATE_COLUMNS;
+
+    for (int i = 0; i < PLATFORMS_COUNT; i++) {
+        params->gp->platforms[i] = create_new_platform(
+            (window_w / PLATFORMS_COUNT) * i +
+                (window_w / PLATFORMS_COUNT / 2) - platform_width / 2,
+            500);
+    }
 
     set_active_screen(GAME, params);
 };

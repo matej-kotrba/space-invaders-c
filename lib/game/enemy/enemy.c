@@ -3,9 +3,11 @@
 #include <SDL2/SDL.h>
 
 #include "../../hitboxes.h"
+#include "../../setup.h"
 #include "../projectile/projectile.h"
 
-Enemy create_new_enemy(int x, int y, float xs, float ys, EnemyType enemy_type) {
+Enemy create_new_enemy(int x, int y, float xs, float ys, EnemyType enemy_type,
+                       Sprite* sprite) {
     int shoot_delay = 0;
     if (enemy_type == SHOOTER) {
         shoot_delay = get_shoot_delay();
@@ -18,11 +20,16 @@ Enemy create_new_enemy(int x, int y, float xs, float ys, EnemyType enemy_type) {
                 .w = ENEMY_WIDTH,
                 .h = ENEMY_HEIGHT,
                 .type = enemy_type,
-                .shoot_delay = shoot_delay};
+                .shoot_delay = shoot_delay,
+                .sprite = sprite};
     return en;
 }
 
-void create_enemy_grid(Enemy* arr, int starting_x, int starting_y) {
+void create_enemy_grid(Enemy* arr, int starting_x, int starting_y,
+                       Sprite* sprites) {
+    const int template[ENEMY_GRID_ROW_LENGTH] = {SHOOTER, BLOCKER_A, BLOCKER_A,
+                                                 BLOCKER_B, BLOCKER_B};
+
     for (int i = 0; i < ENEMY_GRID_COLUMN_LENGTH; i++) {
         for (int j = 0; j < ENEMY_GRID_ROW_LENGTH; j++) {
             Enemy en = {.x = starting_x + (i * ENEMY_WIDTH * ENEMY_GAP_VALUE),
@@ -30,7 +37,7 @@ void create_enemy_grid(Enemy* arr, int starting_x, int starting_y) {
             arr[i * ENEMY_GRID_ROW_LENGTH + j] = create_new_enemy(
                 starting_x + j * ENEMY_WIDTH + j * ENEMY_GAP_VALUE,
                 starting_y + i * ENEMY_HEIGHT + i * ENEMY_GAP_VALUE, 1, 0,
-                i == 0 ? SHOOTER : BLOCKER);
+                template[i], &(sprites[i]));
         }
     }
 }
@@ -43,8 +50,10 @@ int get_enemy_grid_offset(int window_width, int enemy_row_count,
 }
 
 void render_enemy(Enemy* enemy, SDL_Renderer* renderer) {
-    if (enemy->type == BLOCKER) {
+    if (enemy->type == BLOCKER_A) {
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    } else if (enemy->type == BLOCKER_B) {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     } else if (enemy->type == SHOOTER) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
     }

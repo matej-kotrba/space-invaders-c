@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
+#include "../../setup.h"
 #include "../projectile/projectile.h"
 
 #define ENEMY_WIDTH 50
@@ -14,7 +15,7 @@
 
 #define SHOOTER_SHOOT_INVERVAL_MS 3000
 
-typedef enum { BLOCKER, SHOOTER } EnemyType;
+typedef enum { BLOCKER_A, BLOCKER_B, SHOOTER } EnemyType;
 
 typedef struct {
     float x;
@@ -25,9 +26,13 @@ typedef struct {
     float ys;
     EnemyType type;
     int shoot_delay;
+    Sprite* sprite;
 } Enemy;
 
-void create_enemy_grid(Enemy* arr, int starting_x, int starting_y);
+Enemy create_new_enemy(int x, int y, float xs, float ys, EnemyType enemy_type,
+                       Sprite* sprite);
+void create_enemy_grid(Enemy* arr, int starting_x, int starting_y,
+                       Sprite* sprites);
 int get_enemy_grid_offset(int window_width, int enemy_row_count,
                           int enemy_width, int grid_gap);
 void render_enemy(Enemy* enemy, SDL_Renderer* renderer);

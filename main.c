@@ -50,12 +50,14 @@ int main(int argc, char* argv[]) {
     Fonts fonts = get_fonts();
     Cursors cursors = get_cursors();
     Images images = get_images(renderer);
+    Sprite* invaders_sprites = get_invader_sprites(renderer);
 
     ScreenProperties screen_properties;
     screen_properties.window = window;
     screen_properties.fonts = &fonts;
     screen_properties.cursors = &cursors;
     screen_properties.images = &images;
+    screen_properties.invader_sprites = invaders_sprites;
     screen_properties.scoreboard_records = NULL;
     screen_properties.scoreboard_records_len = 0;
 
@@ -356,6 +358,7 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < gp.spread_effects_length; i++) {
         free(gp.spread_effects[i].particles);
     }
+    // free(invaders_sprites);
     free(gp.spread_effects);
     free(screen_properties.buttons);
     SDL_DestroyRenderer(renderer);
