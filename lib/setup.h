@@ -22,6 +22,7 @@ typedef struct {
     SDL_Texture* image;
     int length;
     int width;
+    int height;
 } Sprite;
 
 Fonts get_fonts();

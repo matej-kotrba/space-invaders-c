@@ -13,15 +13,22 @@ Enemy create_new_enemy(int x, int y, float xs, float ys, EnemyType enemy_type,
         shoot_delay = get_shoot_delay();
     }
 
-    Enemy en = {.x = x,
+    int w =
+        ENEMY_WIDTH / ((float)ENEMY_SPRITE_MAX_WIDTH / (float)sprite->width);
+    int h =
+        ENEMY_HEIGHT / ((float)ENEMY_SPRITE_MAX_WIDTH / (float)sprite->height);
+
+    Enemy en = {.x = x + (ENEMY_WIDTH - w) / 2,
                 .y = y,
                 .xs = xs,
                 .ys = ys,
-                .w = ENEMY_WIDTH,
-                .h = ENEMY_HEIGHT,
+                .w = w,
+                .h = h,
                 .type = enemy_type,
                 .shoot_delay = shoot_delay,
-                .sprite = sprite};
+                .sprite = sprite,
+                .sprite_index = 0,
+                .sprite_change_delay = ENEMY_DEFAULT_SPRITE_CHANGE_DELAY_MS};
     return en;
 }
 
@@ -37,7 +44,7 @@ void create_enemy_grid(Enemy* arr, int starting_x, int starting_y,
             arr[i * ENEMY_GRID_ROW_LENGTH + j] = create_new_enemy(
                 starting_x + j * ENEMY_WIDTH + j * ENEMY_GAP_VALUE,
                 starting_y + i * ENEMY_HEIGHT + i * ENEMY_GAP_VALUE, 1, 0,
-                template[i], &(sprites[i]));
+                template[i], &(sprites[template[i]]));
         }
     }
 }
@@ -50,18 +57,16 @@ int get_enemy_grid_offset(int window_width, int enemy_row_count,
 }
 
 void render_enemy(Enemy* enemy, SDL_Renderer* renderer) {
-    if (enemy->type == BLOCKER_A) {
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    } else if (enemy->type == BLOCKER_B) {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    } else if (enemy->type == SHOOTER) {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-    }
+    SDL_Rect src_rect = {.x = enemy->sprite->width * enemy->sprite_index,
+                         .y = 0,
+                         .w = enemy->sprite->width,
+                         .h = enemy->sprite->height};
 
     SDL_Rect rect = {
         .x = enemy->x, .y = enemy->y, .w = enemy->w, .h = enemy->h};
 
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderCopyEx(renderer, enemy->sprite->image, &src_rect, &rect, 0, NULL,
+                     SDL_FLIP_NONE);
 }
 
 void update_enemy(Enemy* enemy, int window_width, float delta_time) {
@@ -69,6 +74,11 @@ void update_enemy(Enemy* enemy, int window_width, float delta_time) {
     enemy->y += enemy->ys * delta_time * 50.0;
 
     enemy->shoot_delay -= delta_time * 1000;
+    enemy->sprite_change_delay -= delta_time * 1000;
+    if (enemy->sprite_change_delay <= 0) {
+        enemy->sprite_index = (enemy->sprite_index + 1) % enemy->sprite->length;
+        enemy->sprite_change_delay = ENEMY_DEFAULT_SPRITE_CHANGE_DELAY_MS;
+    }
 }
 
 float get_offset_over_border(Enemy* enemy, int window_width) {

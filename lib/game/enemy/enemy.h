@@ -8,12 +8,15 @@
 
 #define ENEMY_WIDTH 50
 #define ENEMY_HEIGHT 40
+#define ENEMY_SPRITE_MAX_WIDTH 24
 
 #define ENEMY_GRID_ROW_LENGTH 10
 #define ENEMY_GRID_COLUMN_LENGTH 5
 #define ENEMY_GAP_VALUE 10
 
 #define SHOOTER_SHOOT_INVERVAL_MS 3000
+
+#define ENEMY_DEFAULT_SPRITE_CHANGE_DELAY_MS 1000.0
 
 typedef enum { BLOCKER_A, BLOCKER_B, SHOOTER } EnemyType;
 
@@ -27,6 +30,8 @@ typedef struct {
     EnemyType type;
     int shoot_delay;
     Sprite* sprite;
+    int sprite_index;
+    float sprite_change_delay;
 } Enemy;
 
 Enemy create_new_enemy(int x, int y, float xs, float ys, EnemyType enemy_type,
