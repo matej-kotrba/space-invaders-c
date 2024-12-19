@@ -7,6 +7,7 @@
 #include "../game/platforms/platforms.h"
 #include "../game/player/player.h"
 #include "../menu/button.h"
+#include "../modifiers.h"
 #include "../setup.h"
 #include "../utils.h"
 
@@ -34,6 +35,8 @@ typedef struct {
     int buttons_len;
 
     SDL_Cursor* cursor;
+
+    Modifiers modifiers;
 
     ScoreboardRecord* scoreboard_records;
     int scoreboard_records_len;

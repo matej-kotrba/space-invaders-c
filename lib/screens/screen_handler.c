@@ -261,6 +261,11 @@ void init_scoreboard_screen(GameParams* params) {
     fclose(scoreboard);
 }
 
+void options_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    set_active_screen(OPTIONS, params);
+}
+
 void init_options_screen(GameParams* params) {
     const int buttons_len = 1;
     int window_w, window_h;
