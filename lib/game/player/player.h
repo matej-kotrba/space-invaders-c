@@ -8,7 +8,6 @@
 
 #define PLAYER_WIDTH 80
 #define PLAYER_HEIGHT 50
-#define PLAYER_DEFAULT_HP 1
 #define PLAYER_DEFAULT_SPEED 200.0
 
 #define PLAYER_HP_DISPLAY_GAP 10
@@ -26,7 +25,8 @@ typedef struct {
     SDL_Texture* texture;
 } Player;
 
-Player create_new_player(float x, float y, int w, int h, SDL_Texture* texture);
+Player create_new_player(float x, float y, int w, int h, int hp,
+                         SDL_Texture* texture);
 
 void render_player(Player*, SDL_Renderer*);
 void update_player(Player* player, int screen_width, float delta_time);

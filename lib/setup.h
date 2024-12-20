@@ -6,6 +6,7 @@
 typedef struct {
     TTF_Font* pixeled;
     TTF_Font* pixeled_small;
+    TTF_Font* pixeled_smallest;
 } Fonts;
 
 typedef struct {

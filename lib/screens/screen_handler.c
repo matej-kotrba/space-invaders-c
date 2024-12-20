@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = MENU;
+static Screen active_screen = OPTIONS;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -49,7 +49,9 @@ void init_screen(Screen screen, GameParams* params) {
 
             params->gp->player = create_new_player(
                 (float)(window_w / 2 - 25), (float)(window_h - 100),
-                PLAYER_WIDTH, PLAYER_HEIGHT, params->sp->images->player_ship);
+                PLAYER_WIDTH, PLAYER_HEIGHT,
+                params->sp->modifiers.modifiers_int[PLAYER_LIVES].current,
+                params->sp->images->player_ship);
 
             params->gp->enemies_length =
                 ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
@@ -134,7 +136,9 @@ void restart_game_fn(void* p) {
 
     params->gp->player = create_new_player(
         (float)(window_w / 2 - 25), (float)(window_h - 100), PLAYER_WIDTH,
-        PLAYER_HEIGHT, params->sp->images->player_ship);
+        PLAYER_HEIGHT,
+        params->sp->modifiers.modifiers_int[PLAYER_LIVES].current,
+        params->sp->images->player_ship);
 
     params->gp->enemies_length =
         ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
@@ -306,8 +310,23 @@ void options_fn(void* p) {
     set_active_screen(OPTIONS, params);
 }
 
+void increase_modifier(void* p) {
+    ModifierInt* modifier = (ModifierInt*)p;
+    printf("Current: %d\n", modifier->current);
+    if (modifier->max > modifier->current) {
+        modifier->current++;
+    }
+}
+
+void decrease_modifier(void* p) {
+    ModifierInt* modifier = (ModifierInt*)p;
+    if (modifier->min < modifier->current) {
+        modifier->current--;
+    }
+}
+
 void init_options_screen(GameParams* params) {
-    const int buttons_len = 1;
+    const int buttons_len = 1 + params->sp->modifiers.modifiers_int_length * 2;
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
@@ -322,6 +341,24 @@ void init_options_screen(GameParams* params) {
 
     params->sp->buttons[0] = create_new_button(
         20, 20, params->sp->fonts->pixeled_small, c, back, back_fn, params);
+
+    const char* plus = "+";
+    const char* minus = "-";
+
+    Vector2 plus_sizes = get_text_size(params->sp->fonts->pixeled_small, plus);
+    Vector2 minus_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, minus);
+
+    for (int i = 0; i < params->sp->modifiers.modifiers_int_length; i++) {
+        params->sp->buttons[i * 2 + 1] = create_new_button(
+            window_w / 2 - 200 - minus_sizes.x, 120 + i * 100,
+            params->sp->fonts->pixeled_small, c, minus, decrease_modifier,
+            &params->sp->modifiers.modifiers_int[i]);
+        params->sp->buttons[i * 2 + 2] = create_new_button(
+            window_w / 2 + 200, 120 + i * 100, params->sp->fonts->pixeled_small,
+            c, plus, increase_modifier,
+            &params->sp->modifiers.modifiers_int[i]);
+    }
 }
 
 void play_game_fn(void* p) {
@@ -468,6 +505,17 @@ void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
                      SDL_FLIP_NONE);
 }
 
+int render_option(SDL_Renderer* renderer, int window_w, ScreenProperties* sp,
+                  int i, const char* text) {
+    Vector2 option_sizes = get_text_size(sp->fonts->pixeled_smallest, text);
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+    render_text(renderer, sp->fonts->pixeled_smallest,
+                window_w / 2 - option_sizes.x / 2, 130 + i * 100, c, text);
+
+    return i + 1;
+}
+
 void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     int window_w, window_h;
     SDL_GetWindowSize(sp->window, &window_w, &window_h);
@@ -483,6 +531,12 @@ void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
     render_text(renderer, sp->fonts->pixeled,
                 window_w / 2 - options_sizes.x / 2, 20, c, options);
+
+    int i = render_option(renderer, window_w, sp, 0, "Platforms count");
+    i = render_option(renderer, window_w, sp, i, "Player lives");
+    // render_text(renderer, sp->fonts->pixeled_smallest, window_w / 2 - 100,
+    // 100,
+    //             c, "Platforms count");
 }
 
 void game_cleanup(GameParams* params) {

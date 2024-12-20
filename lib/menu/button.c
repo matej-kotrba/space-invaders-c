@@ -59,8 +59,10 @@ void render_button(Button* this, SDL_Renderer* renderer, SDL_Cursor** cursor,
 void handle_button_events(Button* button) {
     Vector2 sizes = get_button_size(button);
 
-    SDL_Rect rect = {
-        .x = button->x, .y = button->y, .w = sizes.x, .h = sizes.y};
+    SDL_Rect rect = {.x = button->x - BORDER_MARGIN,
+                     .y = button->y - BORDER_MARGIN,
+                     .w = sizes.x + 2 * BORDER_MARGIN,
+                     .h = sizes.y + 2 * BORDER_MARGIN};
 
     if (inputs.leftmouse_click == 1 &&
         is_point_over_rect(&inputs.mouse_pos, &rect)) {

@@ -6,14 +6,15 @@
 #include "../../utils.h"
 #include "../projectile/projectile.h"
 
-Player create_new_player(float x, float y, int w, int h, SDL_Texture* texture) {
+Player create_new_player(float x, float y, int w, int h, int hp,
+                         SDL_Texture* texture) {
     Player new_player = {
         .x = x,
         .y = y,
         .w = w,
         .h = h,
-        .hp = PLAYER_DEFAULT_HP,
-        .max_hp = PLAYER_DEFAULT_HP,
+        .hp = hp,
+        .max_hp = hp,
         .s = PLAYER_DEFAULT_SPEED,
         .can_shoot = true,
         .projectile = create_new_bullet(-100, -100, 1, 1, -1, -1),

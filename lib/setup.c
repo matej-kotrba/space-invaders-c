@@ -9,7 +9,9 @@ Fonts get_fonts() {
         .pixeled = TTF_OpenFont(
             "../static/fonts/Pixelify_Sans/PixelifySans-Medium.ttf", 64),
         .pixeled_small = TTF_OpenFont(
-            "../static/fonts/Pixelify_Sans/PixelifySans-Medium.ttf", 44)};
+            "../static/fonts/Pixelify_Sans/PixelifySans-Medium.ttf", 44),
+        .pixeled_smallest = TTF_OpenFont(
+            "../static/fonts/Pixelify_Sans/PixelifySans-Medium.ttf", 32)};
 
     return fonts;
 }

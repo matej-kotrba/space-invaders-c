@@ -85,3 +85,7 @@ void init_options_screen(GameParams* params);
 void increment_page(void* p);
 void decrement_page(void* p);
 void game_cleanup(GameParams* params);
+int render_option(SDL_Renderer* renderer, int window_w, ScreenProperties* sp,
+                  int i, const char* text);
+void increase_modifier(void* p);
+void decrease_modifier(void* p);

@@ -21,16 +21,23 @@ Modifiers get_modifiers() {
     FILE* modificators_file = fopen("modificators.txt", "r");
 
     Modifiers modifiers;
-    modifiers.modifiers_int_length = 1;
+    // TODO: CHANGE EVERY TIME NEW MODIFIER IS ADDED
+    modifiers.modifiers_int_length = 2;
+
     modifiers.modifiers_int = (ModifierInt*)malloc(
         modifiers.modifiers_int_length * sizeof(ModifierInt));
 
     modifiers.modifiers_int[PLATFORMS_COUNT].min = PLATFORMS_COUNT_MIN;
     modifiers.modifiers_int[PLATFORMS_COUNT].max = PLATFORMS_COUNT_MAX;
 
+    modifiers.modifiers_int[PLAYER_LIVES].min = PLAYER_LIVES_MIN;
+    modifiers.modifiers_int[PLAYER_LIVES].max = PLAYER_LIVES_MAX;
+
     if (modificators_file == NULL) {
         modifiers.modifiers_int[PLATFORMS_COUNT].current =
             PLATFORMS_COUNT_DEFAULT;
+
+        modifiers.modifiers_int[PLAYER_LIVES].current = PLAYER_LIVES_DEFAULT;
 
         save_modifiers(&modifiers);
     } else {
