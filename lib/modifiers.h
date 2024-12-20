@@ -22,3 +22,4 @@ typedef struct {
 } Modifiers;
 
 Modifiers get_modifiers();
+void save_modifiers(void* p);

@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void save_modifiers(Modifiers* modifiers) {
+void save_modifiers(void* p) {
+    Modifiers* modifiers = (Modifiers*)p;
+
     FILE* modificators_file = fopen("modificators.txt", "w");
     if (modificators_file == NULL) {
         printf("Error opening modifications file\n");

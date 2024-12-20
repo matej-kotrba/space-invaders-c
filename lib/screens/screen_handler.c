@@ -325,7 +325,8 @@ void decrease_modifier(void* p) {
 }
 
 void init_options_screen(GameParams* params) {
-    const int buttons_len = 1 + params->sp->modifiers.modifiers_int_length * 2;
+    const int buttons_len =
+        1 + 1 + params->sp->modifiers.modifiers_int_length * 2;
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
@@ -358,6 +359,13 @@ void init_options_screen(GameParams* params) {
             c, plus, increase_modifier,
             &params->sp->modifiers.modifiers_int[i]);
     }
+
+    const char* save = "Save";
+    Vector2 save_sizes = get_text_size(params->sp->fonts->pixeled_small, save);
+    params->sp->buttons[buttons_len - 1] =
+        create_new_button(window_w / 2 - save_sizes.x / 2, window_h - 100,
+                          params->sp->fonts->pixeled_small, c, save,
+                          save_modifiers, &params->sp->modifiers);
 }
 
 void play_game_fn(void* p) {
