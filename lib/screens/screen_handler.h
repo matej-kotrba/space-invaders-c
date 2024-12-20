@@ -16,8 +16,6 @@
 
 #define ENEMY_SCORE 10
 
-#define SCOREBOARD_RECORDS_ROW_LENGTH
-
 typedef enum { MENU, GAME, GAMEOVER, SCOREBOARD, OPTIONS } Screen;
 
 typedef struct {
@@ -33,7 +31,6 @@ typedef struct {
     Sprite* invader_sprites;
     Button* buttons;
     int buttons_len;
-
     SDL_Cursor* cursor;
 
     Modifiers modifiers;
@@ -45,6 +42,7 @@ typedef struct {
 } ScreenProperties;
 
 typedef struct {
+    bool did_play;
     int score;
     float seconds;
     Player player;
@@ -57,7 +55,7 @@ typedef struct {
     int spread_effects_length;
     int spread_effects_max;
     SpreadEffect* spread_effects;
-    Platform platforms[PLATFORMS_COUNT];
+    Platform* platforms;
 } GameProperties;
 
 typedef struct {
@@ -86,3 +84,4 @@ void init_scoreboard_screen(GameParams* params);
 void init_options_screen(GameParams* params);
 void increment_page(void* p);
 void decrement_page(void* p);
+void game_cleanup(GameParams* params);

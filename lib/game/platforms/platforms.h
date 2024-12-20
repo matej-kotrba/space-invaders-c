@@ -11,8 +11,6 @@
 #define PLATFORM_PROJECTILE_DIRECT_HIT_THRESHOLD 3
 #define PLATFORM_PROJECTILE_INDIRECT_HIT_THRESHOLD 5
 
-#define PLATFORMS_COUNT 4
-
 typedef struct {
     int x;
     int y;

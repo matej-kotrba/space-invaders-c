@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = OPTIONS;
+static Screen active_screen = MENU;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -75,10 +75,23 @@ void init_screen(Screen screen, GameParams* params) {
             const int platform_width =
                 PLATFORM_PART_SIZE * PLATFORM_TEMPLATE_COLUMNS;
 
-            for (int i = 0; i < PLATFORMS_COUNT; i++) {
+            params->gp->platforms = (Platform*)malloc(
+                sizeof(Platform) *
+                params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
+            for (int i = 0;
+                 i <
+                 params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
+                 i++) {
                 params->gp->platforms[i] = create_new_platform(
-                    (window_w / PLATFORMS_COUNT) * i +
-                        (window_w / PLATFORMS_COUNT / 2) - platform_width / 2,
+                    (window_w /
+                     params->sp->modifiers.modifiers_int[PLATFORMS_COUNT]
+                         .current) *
+                            i +
+                        (window_w /
+                         params->sp->modifiers.modifiers_int[PLATFORMS_COUNT]
+                             .current /
+                         2) -
+                        platform_width / 2,
                     500);
             }
 
@@ -94,14 +107,28 @@ void restart_game_fn(void* p) {
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
-    for (int i = 0; i < PLATFORMS_COUNT; i++) {
-        free(params->gp->platforms[i].parts);
+    if (params->gp->did_play) {
+        game_cleanup(params);
     }
-    free(params->gp->enemy_bullets);
-    for (int i = 0; i < params->gp->spread_effects_length; i++) {
-        free(params->gp->spread_effects[i].particles);
-    }
-    free(params->gp->spread_effects);
+
+    // if (params->gp->platforms != NULL) {
+    //     free(params->gp->platforms);
+    // }
+    // params->gp->platforms = (Platform*)malloc(
+    //     sizeof(Platform) *
+    //     params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
+    // for (int i = 0;
+    //      i < params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
+    //      i++) {
+    //     free(params->gp->platforms[i].parts);
+    // }
+
+    // free(params->gp->enemy_bullets);
+    // printf("Restarting game\n");
+    // for (int i = 0; i < params->gp->spread_effects_length; i++) {
+    //     free(params->gp->spread_effects[i].particles);
+    // }
+    // free(params->gp->spread_effects);
 
     params->gp->score = 0;
 
@@ -130,12 +157,25 @@ void restart_game_fn(void* p) {
 
     const int platform_width = PLATFORM_PART_SIZE * PLATFORM_TEMPLATE_COLUMNS;
 
-    for (int i = 0; i < PLATFORMS_COUNT; i++) {
+    params->gp->platforms = (Platform*)malloc(
+        sizeof(Platform) *
+        params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
+
+    for (int i = 0;
+         i < params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
+         i++) {
         params->gp->platforms[i] = create_new_platform(
-            (window_w / PLATFORMS_COUNT) * i +
-                (window_w / PLATFORMS_COUNT / 2) - platform_width / 2,
+            (window_w /
+             params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current) *
+                    i +
+                (window_w /
+                 params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current /
+                 2) -
+                platform_width / 2,
             500);
     }
+    // printf("Restarting game\n");
+    params->gp->did_play = true;
 
     set_active_screen(GAME, params);
 };
@@ -294,11 +334,6 @@ void scoreboard_fn(void* p) {
     set_active_screen(SCOREBOARD, params);
 }
 
-void options_fn(void* p) {
-    GameParams* params = (GameParams*)p;
-    set_active_screen(OPTIONS, params);
-}
-
 void init_menu_screen(GameParams* params) {
     const int buttons_len = 3;
     int window_w, window_h;
@@ -448,4 +483,19 @@ void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
     render_text(renderer, sp->fonts->pixeled,
                 window_w / 2 - options_sizes.x / 2, 20, c, options);
+}
+
+void game_cleanup(GameParams* params) {
+    for (int i = 0;
+         i < params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
+         i++) {
+        free(params->gp->platforms[i].parts);
+    }
+    free(params->gp->platforms);
+
+    free(params->gp->enemy_bullets);
+    for (int i = 0; i < params->gp->spread_effects_length; i++) {
+        free(params->gp->spread_effects[i].particles);
+    }
+    free(params->gp->spread_effects);
 }
