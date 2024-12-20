@@ -312,7 +312,6 @@ void options_fn(void* p) {
 
 void increase_modifier(void* p) {
     ModifierInt* modifier = (ModifierInt*)p;
-    printf("Current: %d\n", modifier->current);
     if (modifier->max > modifier->current) {
         modifier->current++;
     }
@@ -506,12 +505,14 @@ void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
 }
 
 int render_option(SDL_Renderer* renderer, int window_w, ScreenProperties* sp,
-                  int i, const char* text) {
+                  int i, const char* text, int value) {
+    char buffer[30];
+    sprintf(buffer, "%s: %d", text, value);
     Vector2 option_sizes = get_text_size(sp->fonts->pixeled_smallest, text);
 
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
     render_text(renderer, sp->fonts->pixeled_smallest,
-                window_w / 2 - option_sizes.x / 2, 130 + i * 100, c, text);
+                window_w / 2 - option_sizes.x / 2, 130 + i * 100, c, buffer);
 
     return i + 1;
 }
@@ -532,8 +533,10 @@ void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     render_text(renderer, sp->fonts->pixeled,
                 window_w / 2 - options_sizes.x / 2, 20, c, options);
 
-    int i = render_option(renderer, window_w, sp, 0, "Platforms count");
-    i = render_option(renderer, window_w, sp, i, "Player lives");
+    int i = render_option(renderer, window_w, sp, 0, "Platforms count",
+                          sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
+    i = render_option(renderer, window_w, sp, i, "Player lives",
+                      sp->modifiers.modifiers_int[PLAYER_LIVES].current);
     // render_text(renderer, sp->fonts->pixeled_smallest, window_w / 2 - 100,
     // 100,
     //             c, "Platforms count");
