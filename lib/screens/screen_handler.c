@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = OPTIONS;
+static Screen active_screen = MENU;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -43,64 +43,16 @@ void init_screen(Screen screen, GameParams* params) {
             init_options_screen(params);
             break;
         case GAME:
-            params->gp->score = 0;
-            int window_w, window_h;
-            SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
-
-            params->gp->player = create_new_player(
-                (float)(window_w / 2 - 25), (float)(window_h - 100),
-                PLAYER_WIDTH, PLAYER_HEIGHT,
-                params->sp->modifiers.modifiers_int[PLAYER_LIVES].current,
-                params->sp->images->player_ship);
-
-            params->gp->enemies_length =
-                ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH;
-            // Enemy enemies[ENEMY_GRID_ROW_LENGTH * ENEMY_GRID_COLUMN_LENGTH];
-            create_enemy_grid(
-                params->gp->enemies,
-                get_enemy_grid_offset(window_h, ENEMY_GRID_ROW_LENGTH,
-                                      ENEMY_WIDTH, ENEMY_GAP_VALUE),
-                50, params->sp->invader_sprites);
-
-            params->gp->can_player_shoot = true;
-
-            params->gp->enemy_bullets_length = 0;
-            params->gp->enemy_bullets_max = ENEMY_BULLET_ALLOC_COUNT;
-            params->gp->enemy_bullets =
-                (Bullet*)malloc(sizeof(Bullet) * ENEMY_BULLET_ALLOC_COUNT);
-
-            params->gp->spread_effects_length = 0;
-            params->gp->spread_effects_max = SPREAD_EFFECTS_ALLOC_COUNT;
-            params->gp->spread_effects = (SpreadEffect*)malloc(
-                sizeof(SpreadEffect) * SPREAD_EFFECTS_ALLOC_COUNT);
-
-            const int platform_width =
-                PLATFORM_PART_SIZE * PLATFORM_TEMPLATE_COLUMNS;
-
-            params->gp->platforms = (Platform*)malloc(
-                sizeof(Platform) *
-                params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
-            for (int i = 0;
-                 i <
-                 params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
-                 i++) {
-                params->gp->platforms[i] = create_new_platform(
-                    (window_w /
-                     params->sp->modifiers.modifiers_int[PLATFORMS_COUNT]
-                         .current) *
-                            i +
-                        (window_w /
-                         params->sp->modifiers.modifiers_int[PLATFORMS_COUNT]
-                             .current /
-                         2) -
-                        platform_width / 2,
-                    500);
-            }
-
+            init_game(params);
             break;
         default:
             break;
     }
+}
+
+void continue_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    params->gp->is_running = true;
 }
 
 void restart_game_fn(void* p) {
@@ -113,26 +65,8 @@ void restart_game_fn(void* p) {
         game_cleanup(params);
     }
 
-    // if (params->gp->platforms != NULL) {
-    //     free(params->gp->platforms);
-    // }
-    // params->gp->platforms = (Platform*)malloc(
-    //     sizeof(Platform) *
-    //     params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
-    // for (int i = 0;
-    //      i < params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
-    //      i++) {
-    //     free(params->gp->platforms[i].parts);
-    // }
-
-    // free(params->gp->enemy_bullets);
-    // printf("Restarting game\n");
-    // for (int i = 0; i < params->gp->spread_effects_length; i++) {
-    //     free(params->gp->spread_effects[i].particles);
-    // }
-    // free(params->gp->spread_effects);
-
     params->gp->score = 0;
+    params->gp->is_running = true;
 
     params->gp->player = create_new_player(
         (float)(window_w / 2 - 25), (float)(window_h - 100), PLAYER_WIDTH,
@@ -188,6 +122,40 @@ void return_to_menu_fn(void* p) {
     GameParams* params = (GameParams*)p;
     printf("Returning to menu\n");
     set_active_screen(MENU, params);
+}
+
+void init_game(GameParams* params) {
+    const int buttons_len = 3;
+
+    int window_w, window_h;
+    SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
+
+    params->sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
+    params->sp->buttons_len = buttons_len;
+
+    const char* cont = "Continue";
+    const char* restart = "Restart";
+    const char* return_to_menu = "Return to menu";
+
+    Vector2 continue_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, cont);
+    Vector2 restart_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, restart);
+    Vector2 return_to_menu_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, return_to_menu);
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+
+    params->sp->buttons[0] = create_new_button(
+        window_w / 2 - continue_sizes.x / 2, window_h / 2,
+        params->sp->fonts->pixeled_small, c, cont, continue_fn, params);
+    params->sp->buttons[1] = create_new_button(
+        window_w / 2 - restart_sizes.x / 2, window_h / 2 + 100,
+        params->sp->fonts->pixeled_small, c, restart, restart_game_fn, params);
+    params->sp->buttons[2] =
+        create_new_button(window_w / 2 - return_to_menu_sizes.x / 2,
+                          window_h / 2 + 200, params->sp->fonts->pixeled_small,
+                          c, return_to_menu, return_to_menu_fn, params);
 }
 
 void init_gameover_screen(GameParams* params) {
@@ -410,7 +378,7 @@ void init_menu_screen(GameParams* params) {
 }
 
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
-                            int score, float seconds) {
+                            int score, float seconds, bool is_victory) {
     int window_w, window_h;
     SDL_GetWindowSize(sp->window, &window_w, &window_h);
 
@@ -419,7 +387,7 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
     handle_screen_buttons(sp);
     render_screen_buttons(sp, renderer);
 
-    const char* gameover = "Game Over!";
+    const char* gameover = is_victory ? "Victory!" : "Game Over!";
     char score_text[20];
     sprintf(score_text, "Score: %d", score);
     char time_text[20];
@@ -437,6 +405,24 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
                 window_h / 2 - gameover_sizes.y / 2 - 100, c, gameover);
     render_text(renderer, sp->fonts->pixeled_small, 40, 20, c, score_text);
     render_text(renderer, sp->fonts->pixeled_small, 40, 80, c, time_text);
+}
+
+void render_gamepaused_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
+    int window_w, window_h;
+    SDL_GetWindowSize(sp->window, &window_w, &window_h);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 120);
+    SDL_RenderClear(renderer);
+    handle_screen_buttons(sp);
+    render_screen_buttons(sp, renderer);
+
+    const char* paused = "Game paused";
+
+    Vector2 paused_sizes = get_text_size(sp->fonts->pixeled, paused);
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+    render_text(renderer, sp->fonts->pixeled, window_w / 2 - paused_sizes.x / 2,
+                window_h / 2 - paused_sizes.y / 2 - 100, c, paused);
 }
 
 void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
@@ -551,16 +537,18 @@ void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
 }
 
 void game_cleanup(GameParams* params) {
-    for (int i = 0;
-         i < params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
-         i++) {
-        free(params->gp->platforms[i].parts);
-    }
-    free(params->gp->platforms);
+    if (params->gp->did_play) {
+        for (int i = 0;
+             i < params->sp->modifiers.modifiers_int[PLATFORMS_COUNT].current;
+             i++) {
+            free(params->gp->platforms[i].parts);
+        }
+        free(params->gp->platforms);
 
-    free(params->gp->enemy_bullets);
-    for (int i = 0; i < params->gp->spread_effects_length; i++) {
-        free(params->gp->spread_effects[i].particles);
+        free(params->gp->enemy_bullets);
+        for (int i = 0; i < params->gp->spread_effects_length; i++) {
+            free(params->gp->spread_effects[i].particles);
+        }
+        free(params->gp->spread_effects);
     }
-    free(params->gp->spread_effects);
 }

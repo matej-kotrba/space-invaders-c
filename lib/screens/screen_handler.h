@@ -43,6 +43,7 @@ typedef struct {
 
 typedef struct {
     bool did_play;
+    bool is_running;
     int score;
     float seconds;
     Player player;
@@ -68,11 +69,14 @@ void set_active_screen(Screen new_screen, GameParams* params);
 void handle_screen_buttons(ScreenProperties* sp);
 void render_screen_buttons(ScreenProperties* sp, SDL_Renderer* renderer);
 void init_screen(Screen screen, GameParams* params);
+void init_game(GameParams* params);
+void continue_fn(void* p);
 void restart_game_fn(void* params);
 void return_to_menu_fn(void* params);
 void init_gameover_screen(GameParams* params);
+void render_gamepaused_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
-                            int score, float seconds);
+                            int score, float seconds, bool is_victory);
 void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void render_menu_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp);
