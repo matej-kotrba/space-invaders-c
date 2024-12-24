@@ -380,6 +380,9 @@ int main(int argc, char* argv[]) {
             case OPTIONS:
                 render_options_screen(renderer, &screen_properties);
                 break;
+            case CONTROLS:
+                render_controls_screen(renderer, &screen_properties);
+                break;
             default:
                 break;
         }

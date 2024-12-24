@@ -42,6 +42,9 @@ void init_screen(Screen screen, GameParams* params) {
         case OPTIONS:
             init_options_screen(params);
             break;
+        case CONTROLS:
+            init_controls_screen(params);
+            break;
         case GAME:
             init_game(params);
             break;
@@ -346,8 +349,13 @@ void scoreboard_fn(void* p) {
     set_active_screen(SCOREBOARD, params);
 }
 
+void controls_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+    set_active_screen(CONTROLS, params);
+}
+
 void init_menu_screen(GameParams* params) {
-    const int buttons_len = 3;
+    const int buttons_len = 4;
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
@@ -357,12 +365,15 @@ void init_menu_screen(GameParams* params) {
     const char* play = "Play";
     const char* scoreboard = "Scoreboard";
     const char* options = "Options";
+    const char* controls = "Controls";
 
     Vector2 play_sizes = get_text_size(params->sp->fonts->pixeled_small, play);
     Vector2 scoreboard_sizes =
         get_text_size(params->sp->fonts->pixeled_small, scoreboard);
     Vector2 options_sizes =
         get_text_size(params->sp->fonts->pixeled_small, options);
+    Vector2 controls_sizes =
+        get_text_size(params->sp->fonts->pixeled_small, controls);
 
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
 
@@ -375,6 +386,25 @@ void init_menu_screen(GameParams* params) {
     params->sp->buttons[2] = create_new_button(
         window_w / 2 - options_sizes.x / 2, window_h / 2 + 200,
         params->sp->fonts->pixeled_small, c, options, options_fn, params);
+    params->sp->buttons[3] = create_new_button(
+        window_w / 2 - options_sizes.x / 2, window_h / 2 + 300,
+        params->sp->fonts->pixeled_small, c, controls, controls_fn, params);
+}
+
+void init_controls_screen(GameParams* params) {
+    const int buttons_len = 1;
+    int window_w, window_h;
+    SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
+
+    params->sp->buttons = (Button*)malloc(sizeof(Button) * buttons_len);
+    params->sp->buttons_len = buttons_len;
+
+    const char* back = "<--";
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+
+    params->sp->buttons[0] = create_new_button(
+        20, 20, params->sp->fonts->pixeled_small, c, back, back_fn, params);
 }
 
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
@@ -534,6 +564,28 @@ void render_options_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     // render_text(renderer, sp->fonts->pixeled_smallest, window_w / 2 - 100,
     // 100,
     //             c, "Platforms count");
+}
+
+void render_controls_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
+    int window_w, window_h;
+    SDL_GetWindowSize(sp->window, &window_w, &window_h);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    handle_screen_buttons(sp);
+    render_screen_buttons(sp, renderer);
+
+    const char* options = "Options";
+    Vector2 options_sizes = get_text_size(sp->fonts->pixeled, options);
+
+    SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
+    render_text(renderer, sp->fonts->pixeled,
+                window_w / 2 - options_sizes.x / 2, 20, c, options);
+
+    int i = render_option(renderer, window_w, sp, 0, "Platforms count",
+                          sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
+    i = render_option(renderer, window_w, sp, i, "Player lives",
+                      sp->modifiers.modifiers_int[PLAYER_LIVES].current);
 }
 
 void game_cleanup(GameParams* params) {
