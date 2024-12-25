@@ -64,6 +64,7 @@ int main(int argc, char* argv[]) {
     screen_properties.scoreboard_records = NULL;
     screen_properties.scoreboard_records_len = 0;
     screen_properties.modifiers = modifiers;
+    screen_properties.is_window_running = true;
 
     GameProperties* gp = (GameProperties*)malloc(sizeof(GameProperties));
     gp->is_running = true;
@@ -74,12 +75,11 @@ int main(int argc, char* argv[]) {
     init_screen(get_active_screen(), &game_params);
 
     SDL_Event event;
-    bool running = true;
 
-    while (running == true) {
+    while (screen_properties.is_window_running == true) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                running = false;
+                screen_properties.is_window_running = false;
             }
 
             if (event.type == SDL_KEYDOWN) {
@@ -409,6 +409,7 @@ int main(int argc, char* argv[]) {
         free(screen_properties.buttons);
     }
     free(screen_properties.modifiers.modifiers_int);
+    free(screen_properties.scoreboard_records);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_CloseFont(fonts.pixeled);

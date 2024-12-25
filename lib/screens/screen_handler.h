@@ -24,6 +24,7 @@ typedef struct {
 } ScoreboardRecord;
 
 typedef struct {
+    bool is_window_running;
     SDL_Window* window;
     Fonts* fonts;
     Cursors* cursors;
@@ -84,6 +85,7 @@ void play_game_fn(void* p);
 void options_fn(void* p);
 void init_menu_screen(GameParams* params);
 void back_fn(void* p);
+void exit_fn(void* p);
 void init_scoreboard_screen(GameParams* params);
 void init_options_screen(GameParams* params);
 void init_controls_screen(GameParams* params);

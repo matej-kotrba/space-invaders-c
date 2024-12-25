@@ -354,8 +354,14 @@ void controls_fn(void* p) {
     set_active_screen(CONTROLS, params);
 }
 
+void exit_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+
+    params->sp->is_window_running = false;
+}
+
 void init_menu_screen(GameParams* params) {
-    const int buttons_len = 4;
+    const int buttons_len = 5;
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
@@ -366,6 +372,7 @@ void init_menu_screen(GameParams* params) {
     const char* scoreboard = "Scoreboard";
     const char* options = "Options";
     const char* controls = "Controls";
+    const char* exit = "Exit";
 
     Vector2 play_sizes = get_text_size(params->sp->fonts->pixeled_small, play);
     Vector2 scoreboard_sizes =
@@ -374,21 +381,25 @@ void init_menu_screen(GameParams* params) {
         get_text_size(params->sp->fonts->pixeled_small, options);
     Vector2 controls_sizes =
         get_text_size(params->sp->fonts->pixeled_small, controls);
+    Vector2 exit_sizes = get_text_size(params->sp->fonts->pixeled_small, exit);
 
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
 
     params->sp->buttons[0] = create_new_button(
-        window_w / 2 - play_sizes.x / 2, window_h / 2,
+        window_w / 2 - play_sizes.x / 2, window_h / 2 - 100,
         params->sp->fonts->pixeled_small, c, play, play_game_fn, params);
     params->sp->buttons[1] = create_new_button(
-        window_w / 2 - scoreboard_sizes.x / 2, window_h / 2 + 100,
+        window_w / 2 - scoreboard_sizes.x / 2, window_h / 2,
         params->sp->fonts->pixeled_small, c, scoreboard, scoreboard_fn, params);
     params->sp->buttons[2] = create_new_button(
-        window_w / 2 - options_sizes.x / 2, window_h / 2 + 200,
+        window_w / 2 - options_sizes.x / 2, window_h / 2 + 100,
         params->sp->fonts->pixeled_small, c, options, options_fn, params);
     params->sp->buttons[3] = create_new_button(
-        window_w / 2 - options_sizes.x / 2, window_h / 2 + 300,
+        window_w / 2 - controls_sizes.x / 2, window_h / 2 + 200,
         params->sp->fonts->pixeled_small, c, controls, controls_fn, params);
+    params->sp->buttons[4] = create_new_button(
+        window_w / 2 - exit_sizes.x / 2, window_h / 2 + 300,
+        params->sp->fonts->pixeled_small, c, exit, exit_fn, params);
 }
 
 void init_controls_screen(GameParams* params) {
