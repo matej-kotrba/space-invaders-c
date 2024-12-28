@@ -67,6 +67,7 @@ void handle_button_events(Button* button) {
     if (inputs.leftmouse_click == 1 &&
         is_point_over_rect(&inputs.mouse_pos, &rect)) {
         button->onClick(button->params);
+        inputs.leftmouse_click = 0;
     }
 }
 

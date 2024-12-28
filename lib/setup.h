@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
     SDL_Texture* title;
     SDL_Texture* player_ship;
+    SDL_Texture* controls;
 } Images;
 
 typedef struct {

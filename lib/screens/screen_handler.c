@@ -123,7 +123,6 @@ void restart_game_fn(void* p) {
 
 void return_to_menu_fn(void* p) {
     GameParams* params = (GameParams*)p;
-    printf("Returning to menu\n");
     set_active_screen(MENU, params);
 }
 
@@ -586,17 +585,26 @@ void render_controls_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
     handle_screen_buttons(sp);
     render_screen_buttons(sp, renderer);
 
-    const char* options = "Options";
-    Vector2 options_sizes = get_text_size(sp->fonts->pixeled, options);
+    SDL_Rect rect = {.x = window_w / 2 - 350, .y = 450, .w = 700, .h = 200};
+
+    SDL_RenderCopyEx(renderer, sp->images->controls, NULL, &rect, 0, NULL,
+                     SDL_FLIP_NONE);
+
+    const char* moveLeft = "Move left: A, Arrow left";
+    const char* moveRight = "Move right: D, Arrow right";
+    const char* shoot = "Shoot: Space";
+    const char* pause = "Pause: Esc";
 
     SDL_Color c = {.r = 255, .g = 255, .b = 255, .a = 255};
-    render_text(renderer, sp->fonts->pixeled,
-                window_w / 2 - options_sizes.x / 2, 20, c, options);
 
-    int i = render_option(renderer, window_w, sp, 0, "Platforms count",
-                          sp->modifiers.modifiers_int[PLATFORMS_COUNT].current);
-    i = render_option(renderer, window_w, sp, i, "Player lives",
-                      sp->modifiers.modifiers_int[PLAYER_LIVES].current);
+    render_text(renderer, sp->fonts->pixeled_smallest, window_w / 2 - 350, 220,
+                c, moveLeft);
+    render_text(renderer, sp->fonts->pixeled_smallest, window_w / 2 - 350, 270,
+                c, moveRight);
+    render_text(renderer, sp->fonts->pixeled_smallest, window_w / 2 - 350, 320,
+                c, shoot);
+    render_text(renderer, sp->fonts->pixeled_smallest, window_w / 2 - 350, 370,
+                c, pause);
 }
 
 void game_cleanup(GameParams* params) {
