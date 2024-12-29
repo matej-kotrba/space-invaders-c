@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = GAMEOVER;
+static Screen active_screen = SCOREBOARD;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -290,9 +290,12 @@ void init_scoreboard_screen(GameParams* params) {
         while (ptr != NULL) {
             switch (i) {
                 case 0:
-                    params->sp->scoreboard_records[n - 1].score = atoi(ptr);
+                    strcpy(params->sp->scoreboard_records[n - 1].name, ptr);
                     break;
                 case 1:
+                    params->sp->scoreboard_records[n - 1].score = atoi(ptr);
+                    break;
+                case 2:
                     params->sp->scoreboard_records[n - 1].seconds = atof(ptr);
                     break;
             }
@@ -529,7 +532,7 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
 
     const int row_height = 50;
 
-    const int cols_per_page = 2;
+    const int cols_per_page = 1;
     const int rows_per_page = (window_h - 160) / row_height;
 
     sp->max_pages =
@@ -539,17 +542,18 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
          i < sp->scoreboard_records_len &&
          (sp->current_page + 1) * rows_per_page * cols_per_page;
          i++) {
-        char buffer[30];
+        char buffer[50];
 
         int minutes = (int)(sp->scoreboard_records[i].seconds / 60);
         int secs = (int)(sp->scoreboard_records[i].seconds - (minutes * 60));
         int milisecs =
             (int)((sp->scoreboard_records[i].seconds - (minutes * 60) - secs) *
                   1000);
-        sprintf(buffer, "%03d (%02d:%02d.%02d)",
-                sp->scoreboard_records[i].score, minutes, secs, milisecs);
+        sprintf(buffer, "\"%s\" %03d (%02d:%02d.%02d)",
+                sp->scoreboard_records[i].name, sp->scoreboard_records[i].score,
+                minutes, secs, milisecs);
         render_text(
-            renderer, sp->fonts->pixeled_small,
+            renderer, sp->fonts->pixeled_smallest,
             20 + ((i - sp->current_page * rows_per_page * cols_per_page) /
                   rows_per_page) *
                      window_w / cols_per_page,

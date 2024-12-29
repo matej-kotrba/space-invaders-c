@@ -20,6 +20,7 @@
 typedef enum { MENU, GAME, GAMEOVER, SCOREBOARD, OPTIONS, CONTROLS } Screen;
 
 typedef struct {
+    char name[15];
     int score;
     float seconds;
 } ScoreboardRecord;
