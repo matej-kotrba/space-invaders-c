@@ -171,13 +171,6 @@ int main(int argc, char* argv[]) {
 
                 if (gp->enemies_length <= 0) {
                     set_active_screen(GAMEOVER, &game_params);
-                    FILE* score_file = fopen("scoreboard.txt", "a");
-                    if (score_file == NULL) {
-                        printf("Error opening file!\n");
-                    } else {
-                        fprintf(score_file, "%d;%f\n", gp->score, gp->seconds);
-                        fclose(score_file);
-                    }
                 }
 
                 if (gp->is_running) {
@@ -219,15 +212,7 @@ int main(int argc, char* argv[]) {
                             gp->enemy_bullets[i].should_delete = true;
                             if (gp->player.hp <= 0) {
                                 set_active_screen(GAMEOVER, &game_params);
-                                FILE* score_file = fopen("scoreboard.txt", "a");
-                                if (score_file == NULL) {
-                                    printf("Error opening file!\n");
-                                } else {
-                                    fprintf(score_file, "%d;%f\n", gp->score,
-                                            gp->seconds);
-                                    fclose(score_file);
-                                }
-                            }
+                                                        }
                             continue;
                         }
 

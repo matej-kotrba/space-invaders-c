@@ -77,6 +77,7 @@ void init_game(GameParams* params);
 void continue_fn(void* p);
 void restart_game_fn(void* params);
 void return_to_menu_fn(void* params);
+void save_fn(void* p);
 void init_gameover_screen(GameParams* params);
 void render_gamepaused_screen(SDL_Renderer* renderer, ScreenProperties* sp);
 void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,

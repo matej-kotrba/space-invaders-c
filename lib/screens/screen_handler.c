@@ -172,8 +172,30 @@ void init_game(GameParams* params) {
                           c, return_to_menu, return_to_menu_fn, params);
 }
 
+void save_fn(void* p) {
+    GameParams* params = (GameParams*)p;
+
+    if (strlen(params->sp->text_inputs[0].content) == 0) {
+        return;
+    }
+
+    FILE* score_file = fopen("scoreboard.txt", "a");
+    if (score_file == NULL) {
+        printf("Error opening file!\n");
+    } else {
+        fprintf(score_file, "%s;%d;%f\n", params->sp->text_inputs[0].content,
+                params->gp->score, params->gp->seconds);
+        fclose(score_file);
+    }
+
+    free(params->sp->text_inputs[0].content);
+    free(params->sp->text_inputs);
+    params->sp->text_inputs_len = 0;
+    params->sp->buttons_len--;
+}
+
 void init_gameover_screen(GameParams* params) {
-    const int buttons_len = 2;
+    const int buttons_len = 3;
     const int textinputs_len = 1;
 
     int window_w, window_h;
@@ -184,6 +206,7 @@ void init_gameover_screen(GameParams* params) {
 
     const char* restart = "Restart";
     const char* return_to_menu = "Return to menu";
+    const char* save = "Save";
 
     params->sp->text_inputs =
         (TextInput*)malloc(sizeof(TextInput) * textinputs_len);
@@ -206,6 +229,9 @@ void init_gameover_screen(GameParams* params) {
 
     params->sp->text_inputs[0] = create_new_textinput(
         50, 650, 450, params->sp->fonts->pixeled_small, 15, params);
+
+    params->sp->buttons[2] = create_new_button(
+        520, 650, params->sp->fonts->pixeled_small, c, save, save_fn, params);
 }
 
 void back_fn(void* p) {
@@ -450,6 +476,7 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
     render_screen_textinputs(sp, renderer);
 
     const char* gameover = is_victory ? "Victory!" : "Game Over!";
+    const char* nickname = "Nickname";
     char score_text[20];
     sprintf(score_text, "Score: %d", score);
     char time_text[20];
@@ -467,6 +494,10 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
                 window_h / 2 - gameover_sizes.y / 2 - 100, c, gameover);
     render_text(renderer, sp->fonts->pixeled_small, 40, 20, c, score_text);
     render_text(renderer, sp->fonts->pixeled_small, 40, 80, c, time_text);
+    if (sp->text_inputs_len) {
+        render_text(renderer, sp->fonts->pixeled_smallest, 50, 600, c,
+                    nickname);
+    }
 }
 
 void render_gamepaused_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
