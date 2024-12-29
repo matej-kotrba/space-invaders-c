@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = SCOREBOARD;
+static Screen active_screen = MENU;
 
 Screen get_active_screen() { return active_screen; }
 
@@ -18,6 +18,7 @@ void set_active_screen(Screen new_screen, GameParams* params) {
         free(params->sp->text_inputs);
     }
     params->sp->buttons_len = 0;
+    params->sp->text_inputs_len = 0;
     active_screen = new_screen;
     init_screen(new_screen, params);
 }
