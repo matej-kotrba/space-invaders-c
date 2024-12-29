@@ -10,6 +10,7 @@
 #include "lib/game/player/player.h"
 #include "lib/game/projectile/projectile.h"
 #include "lib/menu/button.h"
+#include "lib/menu/input.h"
 #include "lib/modifiers.h"
 #include "lib/screens/screen_handler.h"
 #include "lib/setup.h"
@@ -100,6 +101,11 @@ int main(int argc, char* argv[]) {
                 if (event.key.keysym.sym == SDLK_SPACE) {
                     inputs.space_press = 1;
                 }
+
+                for (int i = 0; i < screen_properties.text_inputs_len; i++) {
+                    handle_keydown_textinput(&screen_properties.text_inputs[i],
+                                             event.key.keysym.sym);
+                }
             }
 
             if (event.type == SDL_KEYUP) {
@@ -146,6 +152,13 @@ int main(int argc, char* argv[]) {
 
         inputs.mouse_pos.x = mouse_x;
         inputs.mouse_pos.y = mouse_y;
+
+        if (inputs.leftmouse_click == 1) {
+            for (int i = 0; i < screen_properties.text_inputs_len; i++) {
+                handle_textinput_click(&screen_properties.text_inputs[i],
+                                       &inputs.mouse_pos);
+            }
+        }
 
         // SDL_SetCursor(cursors.def);
         // SDL_SetCursor(cursors.pointer);
@@ -408,8 +421,15 @@ int main(int argc, char* argv[]) {
     if (screen_properties.buttons_len > 0) {
         free(screen_properties.buttons);
     }
+    if (screen_properties.text_inputs_len > 0) {
+        for (int i = 0; i < screen_properties.text_inputs_len; i++) {
+            free(screen_properties.text_inputs[i].content);
+        }
+        free(screen_properties.text_inputs);
+    }
     free(screen_properties.modifiers.modifiers_int);
     free(screen_properties.scoreboard_records);
+    free(gp);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_CloseFont(fonts.pixeled);

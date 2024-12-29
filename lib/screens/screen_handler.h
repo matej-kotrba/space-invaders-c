@@ -7,6 +7,7 @@
 #include "../game/platforms/platforms.h"
 #include "../game/player/player.h"
 #include "../menu/button.h"
+#include "../menu/input.h"
 #include "../modifiers.h"
 #include "../setup.h"
 #include "../utils.h"
@@ -32,6 +33,8 @@ typedef struct {
     Sprite* invader_sprites;
     Button* buttons;
     int buttons_len;
+    TextInput* text_inputs;
+    int text_inputs_len;
     SDL_Cursor* cursor;
 
     Modifiers modifiers;

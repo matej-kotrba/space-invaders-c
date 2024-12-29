@@ -3,13 +3,19 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static Screen active_screen = MENU;
+static Screen active_screen = GAMEOVER;
 
 Screen get_active_screen() { return active_screen; }
 
 void set_active_screen(Screen new_screen, GameParams* params) {
     if (params->sp->buttons_len > 0) {
         free(params->sp->buttons);
+    }
+    if (params->sp->text_inputs_len > 0) {
+        for (int i = 0; i < params->sp->text_inputs_len; i++) {
+            free(params->sp->text_inputs[i].content);
+        }
+        free(params->sp->text_inputs);
     }
     params->sp->buttons_len = 0;
     active_screen = new_screen;
@@ -25,6 +31,12 @@ void handle_screen_buttons(ScreenProperties* sp) {
 void render_screen_buttons(ScreenProperties* sp, SDL_Renderer* renderer) {
     for (int i = 0; i < sp->buttons_len; i++) {
         render_button(&sp->buttons[i], renderer, &sp->cursor, sp->cursors);
+    }
+}
+
+void render_screen_textinputs(ScreenProperties* sp, SDL_Renderer* renderer) {
+    for (int i = 0; i < sp->text_inputs_len; i++) {
+        render_textinput(&sp->text_inputs[i], renderer);
     }
 }
 
@@ -162,6 +174,8 @@ void init_game(GameParams* params) {
 
 void init_gameover_screen(GameParams* params) {
     const int buttons_len = 2;
+    const int textinputs_len = 1;
+
     int window_w, window_h;
     SDL_GetWindowSize(params->sp->window, &window_w, &window_h);
 
@@ -170,6 +184,10 @@ void init_gameover_screen(GameParams* params) {
 
     const char* restart = "Restart";
     const char* return_to_menu = "Return to menu";
+
+    params->sp->text_inputs =
+        (TextInput*)malloc(sizeof(TextInput) * textinputs_len);
+    params->sp->text_inputs_len = textinputs_len;
 
     Vector2 restart_sizes =
         get_text_size(params->sp->fonts->pixeled_small, restart);
@@ -185,6 +203,9 @@ void init_gameover_screen(GameParams* params) {
         create_new_button(window_w / 2 - return_to_menu_sizes.x / 2,
                           window_h / 2 + 100, params->sp->fonts->pixeled_small,
                           c, return_to_menu, return_to_menu_fn, params);
+
+    params->sp->text_inputs[0] = create_new_textinput(
+        50, 650, 450, params->sp->fonts->pixeled_small, 15, params);
 }
 
 void back_fn(void* p) {
@@ -426,6 +447,7 @@ void render_gameover_screen(SDL_Renderer* renderer, ScreenProperties* sp,
     SDL_RenderClear(renderer);
     handle_screen_buttons(sp);
     render_screen_buttons(sp, renderer);
+    render_screen_textinputs(sp, renderer);
 
     const char* gameover = is_victory ? "Victory!" : "Game Over!";
     char score_text[20];
