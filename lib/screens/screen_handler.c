@@ -572,9 +572,9 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
                     window_h / 2 - no_records_sizes.y / 2, c, no_records);
     }
 
-    char pages[10];
-    sprintf(pages, "%d/%d", sp->current_page + 1,
-            sp->scoreboard_records_len / (rows_per_page * cols_per_page) + 1);
+    char pages[24];
+    snprintf(pages, sizeof(pages), "%d/%d", sp->current_page + 1,
+             sp->scoreboard_records_len / (rows_per_page * cols_per_page) + 1);
     Vector2 pages_sizes = get_text_size(sp->fonts->pixeled_small, pages);
     SDL_Color c = {255, 255, 255, 255};
     render_text(renderer, sp->fonts->pixeled_small,
