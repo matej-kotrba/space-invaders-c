@@ -29,6 +29,10 @@ Vector2 get_default_bullet_size(BulletType bullet_type) {
         case ENEMY:
             return new_vec2(4, 12);
             break;
+
+        default:
+            return new_vec2(4, 12);
+            break;
     }
 }
 

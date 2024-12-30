@@ -45,30 +45,22 @@ void draw_triangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2,
 
 void draw_circle(SDL_Renderer* renderer, int center_x, int center_y,
                  float radius) {
-    for (int i = 0; i < radius; i++) {
-        for (int j = 0; j < radius; j++) {
-            int x = abs(j - radius);
-            int y = abs(i - radius);
-            float c = sqrt(pow(x, 2) + pow(y, 2));
+    for (int i = 0; i <= 2 * radius; i++) {
+        for (int j = 0; j <= 2 * radius; j++) {
+            float x = j - radius;
+            float y = i - radius;
+            float c = sqrt(x * x + y * y);
 
             if (c <= (float)radius) {
-                int start_x = center_x - (radius - j);
-                int start_y = center_y - (radius);
+                int start_x = center_x - radius;
+                int current_y = center_y - radius + i;
 
-                SDL_RenderDrawLine(renderer, start_x, start_y + i,
-                                   start_x + (radius - j) * 2 + 1, start_y + i);
-                SDL_RenderDrawLine(renderer, start_x, start_y + 2 * radius - i,
-                                   start_x + (radius - j) * 2 + 1,
-                                   start_y + 2 * radius - i);
-
+                SDL_RenderDrawLine(renderer, start_x + j, current_y,
+                                   start_x + 2 * radius - j, current_y);
                 break;
             }
         }
     }
-
-    // And fill the middle
-    SDL_RenderDrawLine(renderer, center_x - radius + 1, center_y,
-                       center_x + radius, center_y);
 }
 
 Vector2 get_text_size(TTF_Font* font, const char* text) {

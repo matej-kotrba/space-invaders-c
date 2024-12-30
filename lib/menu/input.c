@@ -18,7 +18,7 @@ TextInput create_new_textinput(int x, int y, int w, TTF_Font* font,
 
 void handle_keydown_textinput(TextInput* this, char pressed_key) {
     if (this->is_focused && pressed_key >= 'a' && pressed_key <= 'z' &&
-        strlen(this->content) < this->content_max) {
+        (int)strlen(this->content) < this->content_max) {
         char pressed_key_str[2] = {pressed_key, '\0'};
         strcat(this->content, pressed_key_str);
     } else if (pressed_key == SDLK_BACKSPACE && strlen(this->content) > 0) {

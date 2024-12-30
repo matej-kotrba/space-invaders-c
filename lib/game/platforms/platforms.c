@@ -69,10 +69,7 @@ void render_platform(Platform* platform, SDL_Renderer* renderer) {
     }
 }
 
-void platform_hit(Platform* platform, Bullet* bullet, size_t index) {
-    // int bullet_xm = bullet->x + bullet->w / 2;
-    // int bullet_y2 = bullet->y + bullet->h;
-
+void platform_hit(Platform* platform, size_t index) {
     int hit_part_xm =
         platform->x + (index % PLATFORM_TEMPLATE_COLUMNS) * PLATFORM_PART_SIZE;
     int hit_part_ym =

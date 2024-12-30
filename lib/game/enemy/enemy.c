@@ -69,7 +69,7 @@ void render_enemy(Enemy* enemy, SDL_Renderer* renderer) {
                      SDL_FLIP_NONE);
 }
 
-void update_enemy(Enemy* enemy, int window_width, float delta_time) {
+void update_enemy(Enemy* enemy, float delta_time) {
     enemy->x += enemy->xs * delta_time * 50.0;
     enemy->y += enemy->ys * delta_time * 50.0;
 

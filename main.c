@@ -19,7 +19,7 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
 
-int main(int argc, char* argv[]) {
+int main() {
     // SDL init
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
@@ -195,8 +195,7 @@ int main(int argc, char* argv[]) {
                             int index = get_platform_bullet_hit_part_index(
                                 &gp->platforms[i], &gp->player.projectile);
                             if (index == -1) continue;
-                            platform_hit(&gp->platforms[i],
-                                         &gp->player.projectile, index);
+                            platform_hit(&gp->platforms[i], index);
                             reset_player_shot(&gp->player);
                         }
                     }
@@ -212,7 +211,7 @@ int main(int argc, char* argv[]) {
                             gp->enemy_bullets[i].should_delete = true;
                             if (gp->player.hp <= 0) {
                                 set_active_screen(GAMEOVER, &game_params);
-                                                        }
+                            }
                             continue;
                         }
 
@@ -229,14 +228,13 @@ int main(int argc, char* argv[]) {
                             int index = get_platform_bullet_hit_part_index(
                                 &gp->platforms[j], &gp->enemy_bullets[i]);
                             if (index == -1) continue;
-                            platform_hit(&gp->platforms[j],
-                                         &gp->enemy_bullets[i], index);
+                            platform_hit(&gp->platforms[j], index);
                             gp->enemy_bullets[i].should_delete = true;
                         }
                     }
 
                     for (int i = 0; i < gp->enemies_length; i++) {
-                        update_enemy(&gp->enemies[i], WINDOW_WIDTH, delta_time);
+                        update_enemy(&gp->enemies[i], delta_time);
 
                         if (should_spawn_bullet(&gp->enemies[i])) {
                             if (gp->enemy_bullets_length ==

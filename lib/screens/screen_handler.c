@@ -307,12 +307,12 @@ void init_scoreboard_screen(GameParams* params) {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n - 1 - i; j++) {
-            if (params->sp->scoreboard_records[j].score <
-                    params->sp->scoreboard_records[j + 1].score ||
-                params->sp->scoreboard_records[j].score ==
-                        params->sp->scoreboard_records[j + 1].score &&
-                    params->sp->scoreboard_records[j].seconds >
-                        params->sp->scoreboard_records[j + 1].seconds) {
+            if ((params->sp->scoreboard_records[j].score <
+                     params->sp->scoreboard_records[j + 1].score ||
+                 params->sp->scoreboard_records[j].score ==
+                     params->sp->scoreboard_records[j + 1].score) &&
+                params->sp->scoreboard_records[j].seconds >
+                    params->sp->scoreboard_records[j + 1].seconds) {
                 ScoreboardRecord temp = params->sp->scoreboard_records[j];
                 params->sp->scoreboard_records[j] =
                     params->sp->scoreboard_records[j + 1];
@@ -541,7 +541,7 @@ void render_scoreboard_screen(SDL_Renderer* renderer, ScreenProperties* sp) {
 
     for (int i = sp->current_page * rows_per_page;
          i < sp->scoreboard_records_len &&
-         (sp->current_page + 1) * rows_per_page * cols_per_page;
+         i < (sp->current_page + 1) * rows_per_page * cols_per_page;
          i++) {
         char buffer[50];
 
